@@ -6,12 +6,21 @@
 <link rel="stylesheet" type="text/css" media="screen" href="../jw.css" />
 <script src="jquery-1.4.4.js"></script>
 
-<script src="../dialog.js"></script>
+<script src="../jw.js"></script>
 </head>
 <body>
 <script>
-jw.dialog(null,'open',{rel:'http://news.baidu.com/',iframe:true});
+//jw.dialog(null,'open',{rel:'http://127.0.0.1/rare/',iframe:true});
+//jw.alert('asdasd',"3x2");
+jw.alert('您认为如何呢？<input type="text" id="b" style="width:500px">',"3x2","",{cannel:true,okFn:function(){alert($('#b').val());return false;}});
+//prompt("还可以");
 </script>
+<!-- 
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+ -->
+<input type="button" onclick="jw.alert('你确定要这样？','3x2');" value="确认">
+<br/>adassasa
 <a onclick="jw.dialog(null,'open',{rel:'http://du/jq/jquery-ui-1.8.5/',iframe:true});return false;">test</a>
 </body>
 </html>

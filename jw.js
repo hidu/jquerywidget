@@ -47,12 +47,25 @@ window.jw={};
          return false;
       }
     }
-    window.jw=window.jw||{};
     $.extend(jw,{drag:drag});
 })(jQuery);
 
 
 (function($){
+	function over(opt){
+		opt=opt||'show';
+		var over;
+		if(opt=='show'){
+			over=$('.jw_dialog_over')||$('<div class="jw_dialog_over" ></div>');
+			$().ready(function(){
+				$(document.body).append(over);
+				(typeof $.fn.bgiframe=='function') && over.bgiframe();
+				over.height(Math.max($('body').outerHeight(),$(window).height()));
+			});
+		}else{
+			$('.jw_dialog_over').remove();
+		}
+	}
 /**
     *弹出框
     *   需要添加指定的样式  .jw_dialog_over  .jw_dialog 
@@ -67,113 +80,100 @@ window.jw={};
     *@param option.iframe     对上述rel 属性使用iframe 页面加载
     *@param option.width      宽度(可以用%)
     *@param option.height     高度(不使用%）
-    *@param option.minWidth      宽度 px
-    *@param option.minHeight     高度 px
-    *@param option.scroll     是否允许dialog 随着页面滚动(一直居中)
-    *@param option.noOver     若为true,不显示笼罩背景
+    *@param option.fixed     是否允许dialog 随着页面滚动(一直居中)
+    *@param option.over      默认若为true,显示笼罩背景
     *@param option.drag       是否允许拖动，默认允许
     *@param option.maxFn      最大化事件
     *@param option.closeFn    关闭事件
     */
     function dialog(id,operate,option){
-        var dia=null;
+        var dia=null,option=option||{},operate=operate||"open",_id="jw_dialog_"+new Date().getTime(),header;
+        if("close"==operate){
+        	$('.jw_dialog').trigger('close');
+        	return true;
+        }
+       
+        var dialog=$("<table id='"+_id+"' class='jw_dialog'>" +
+        		"<tr class='jw_dialog_tr_first'><td></td><td></td><td></td></tr>" +
+        		"<tr><td rowspan='2'></td><td id='"+_id+"_hd' valign='top' class='jw_dialog_header'></td><td rowspan='2'></td></tr>" +
+        		"<tr><td valign='top' id='"+_id+"_bd'></td></tr>" +
+        		"<tr class='jw_dialog_tr_last'><td></td><td></td><td></td></tr>" +
+        		"</table>");
+        dialog.appendTo(document.body);
+        var body=$('#'+_id+"_bd",dialog);
+        var hd=$('#'+_id+"_hd",dialog);
         
         if(id){
-            dia=$(id);
-        }else{
-            dia=$("<div></div>");  
-            dia.appendTo(document.body);
+            body.append($(id));
+        }
+        if(option.over!=false){over();}
+
+        if(option.title!==false){
+        	   var _div="<div style='float:right'><a href='javascript:;'  style='text-decoration:none;outline:medium none;'";
+              header="<div class='jw_dialog_title'>"+
+                         "<div style='float:left;width:auto' class='jw_title'>"+(option.title||'')+"</div>";
+             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></div>");
+             option.max!=false && (header+=_div+" class='max'>max</a>&nbsp;&nbsp;</div>");
+             header+="<div style='clear:both'></div></div>";
+              header=$(header);
+              hd.append(header);
          }
-        if("close"==operate){
-          dia.trigger('close');
-          return true;
-        }
-        var hasOver=!(option.noOver===true);
-        if(hasOver){
-	         var over=$('<div class="jw_dialog_over" ></div>');
-	         $(document.body).append(over);
-	         (typeof $.fn.bgiframe=='function') && over.bgiframe();
-	         setOver();
-        }
         
-        function setOver(){
-        	if(!hasOver)return;
-        	var bh=$('body').height(),wh=$(window).height();
-	       over.height(bh>wh?bh:wh);
-         }
-         var dialog=dia.parent('div.jw_dialog');
-         dia.addClass('jw_dialog_body');
-         if(!dialog.size()){
-             dia.wrap("<div class='jw_dialog'></div>");
-             if(option.title!==false){
-            	   var _div="<div style='float:right'><a href='javascript:;'  style='text-decoration:none;outline:medium none;'";
-	             var header="<div class='jw_dialog_title'>"+
-	                         "<div style='float:left;width:auto' class='jw_title'>"+(option.title||'')+"</div>";
-	             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></div>");
-	             option.max!=false && (header+=_div+" class='max'>max</a>&nbsp;&nbsp;</div>");
-	             header+="<div style='clear:both'></div></div>";
-	             header=$(header);
-	             dia.before(header);
-             }
-             dialog=dia.parent('div.jw_dialog');
-             dia.show();
-            
-         }
-         
-         
         function setTitle(title){
         	 if(option.title!==false)header.find('.jw_title').text(title);
          }
-         
-         option.width && dialog.width(option.width);
-         var diaHeight=0;
-         if(option.height){
+        var setSize=function(width,height){
+        	width  !=null && dialog.width(Math.max(dialog.outerWidth(),380,width||0));
+        	if(height !=null){
+        		if(option.iframe){
+        			setTimeout(function(){
+        				body.find('.jw_dialog_ifr').height(Math.max(height,140));
+        			},10);
+        		}else{
+        			body.height(Math.max(height,140));
+        		}
+        	} 
+        }
+        setSize();
+        if(option.height){
                var h=option.height;
                if(h.indexOf("%")>0)h=($(window).height()*parseFloat(h)/100.0);
-               dia.height(h);
+               setSize(null,h);
          } 
-        
-//         dialog.show();
          var setPosition=function(){
-        	 if(option.minHeight||'')dia.height()>option.minHeight?"":dia.height(option.minHeight);
-        	 if(option.minWidth||'')dialog.width()>option.minWidth?"":dialog.width(option.minWidth);
-        	 var diaHeight=dialog.outerHeight(),
-        	 diaWidth=dialog.outerWidth();
-        	 var _t=$(window).height()-diaHeight;
-        	 var top=((_t>0?_t:0))/2+$(window).scrollTop(),
-        	     left=($(window).width()-diaWidth)/2+$(window).scrollLeft();
+        	 var top=(Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop(),
+        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
                 dialog.css({top:top,left:left}).show();
            };
+           
           var isMax=false,last={},lastHeight=0;
           var close=function(){
-          	     hasOver && over.remove();
-               id?dialog.hide():dialog.remove();
-               typeof option.closeFn=='function'&& ption.closeFn();
+          	     over('close');
+               dialog.remove();
+               typeof option.closeFn=='function'&& option.closeFn();
            },max=function(){
         	   if(isMax){
         		   dialog.css(last);
-        		   dia.height(lastHeight);
         		   isMax=false;
+        		   setSize(null,lastHeight);
         	   }else{
 	        	   last={top:dialog.css('top'),left:dialog.css('left'),width:dialog.width()};
-	        	   lastHeight=dia.height();
+	        	   lastHeight=body.height();
 	        	   dialog.css({top:$(window).scrollTop(),left:1}).width($(window).width()-5);
-	        	   dia.height($(window).height()-header.outerHeight()-5);
 	        	   isMax=true;
+	        	   setSize(null,$(window).height()-5);
         	   }
         	   typeof option.maxFn=='function' && option.maxFn();
             };
-            
-         if(option.title!=false)header.dblclick(max);
+         
+         if(option.title!=false && !option.max)header.dblclick(max);
            
          if(option.rel){
-             dia.empty();
+             body.empty();
             if(option.iframe){
-            	var ifr=$("<iframe src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
-            	ifr.appendTo(dia);
-            	
+            	var ifr=$("<iframe class='jw_dialog_ifr' src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
+            	ifr.appendTo(body);
             	 ifr.load(function(){
-            		console.log(ifr);return;
             		 var c=null,newHeight=0,newWidth=0;
             		  try{
                           c=$(this).contents();
@@ -189,36 +189,73 @@ window.jw={};
                           
                           if(newHeight>wh){newHeight=wh-52;b1=true;};
                           if(newWidth>ww){newWidth=ww-10;b2=true};
+                          setSize(newWidth+15,newHeight+30);
                           (b1 && b2)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
                          }catch(e){}
                          
-                         dia.height(newHeight+30);
-                         dialog.width(newWidth+15);
                          c.find('.close').click(close).end().find('.max').click(max);
                          setPosition();
             		});
                 setPosition();
             }else{
-                dia.load(option.rel,setPosition);
+                body.load(option.rel,setPosition);
             }
          }else{
         	 setPosition();
          }
          
-        var fn=function(){setPosition();setOver();};
-        $(window).resize(fn).scroll(fn);
-        option.scroll && $(window).scroll(setPosition);
-        dia.add(dialog).bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
+        var fn=function(){setPosition();over();};
+        $(window).resize(fn);
+        option.fixed && $(window).scroll(setPosition);
+        dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
         if(option.close!=false){
         	$(window).keydown(function(e){
         		e.keyCode==27 && close();
         	});
         }
-        (option.drag && false) !=false && jw.drag(header,dialog);
-        return dia;
+//        !!!option.drag && jw.drag(header,dialog);
+        return dialog;
     }
     window.jw=window.jw||{};
     $.extend(jw,{dialog:dialog}); 
+    
+    /**
+     * jw.alert
+     * 弹出提示，有一个图标和提示文字
+     * @param text 提示文字
+     * @param ico  提示图标坐标（如 1x1,5x2)  采用了jw-icons.gif中的图片 每个图片大小为50px
+     * @param title 提示标题
+     * @fn 点击确定时的回调函数 
+     */
+    var jwalert=function(text,ico,title,ext){
+    	ico=((ico||1)+"").split("x");
+    	ext=ext||{};
+    	var x=ico[0],y=ico.length==2?ico[1]:1;
+    	var id="jwalert"+new Date().getTime();
+    	var style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;";
+    	var code="<div class='jw_alert'>" +
+	    			"<table style='width:100%'>" +
+	    			"<tr><td width='60'><div class='jw_icon' style='"+style+"'></div></td><td>"+(text||'')+"</td></tr>" +
+	    			"</table><center>" +
+	    			"<input type='button' value='&nbsp;确 定&nbsp;' id='"+id+"_ok' />";
+			if(!!ext.cannel){
+				code+="&nbsp;&nbsp;<input type='button' value='&nbsp;取 消&nbsp;' id='"+id+"_cannel' />";
+			}
+	    	code+="</center></div>";
+    	var div=$(code);
+    	div.appendTo(document.body);
+    	var call_bk=function(fn){
+    		if(ext){
+    			var rt=(typeof fn=='function'?fn:(typeof ext=='function'?ext:function(){}))();
+    			if(rt===false)return;
+    		} 
+    		dialog(div,'close');
+    	}
+    	$('#'+id+"_ok").click(function(){call_bk(ext.okFn)});
+    	$('#'+id+"_cannel").click(function(){call_bk(ext.cannel)});
+    	dialog(div,"open",{max:false,title:title||'提示',fixed:false});
+      };
+    $.extend(jw,{alert:jwalert}); 
 })(jQuery);
 
 ;(function($){
