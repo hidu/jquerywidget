@@ -56,14 +56,14 @@ window.jw={};
 		opt=opt||'show';
 		var over;
 		if(opt=='show'){
-			over=$('.jw_dialog_over')||$('<div class="jw_dialog_over" ></div>');
+			over=$('<div class="jw_over" ></div>');
 			$().ready(function(){
 				$(document.body).append(over);
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
 				over.height(Math.max($('body').outerHeight(),$(window).height()));
 			});
 		}else{
-			$('.jw_dialog_over').remove();
+			$('.jw_over').remove();
 		}
 	}
 /**
