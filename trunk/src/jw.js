@@ -59,6 +59,7 @@ window.jw={};
 		opt=opt||'show';
 		var over,wh=$(window).height(),bh=$('body').outerHeight();
 		if(opt=='show'){
+			if($('.jw_over').length)return;
 			over=$('<div class="jw_over" ><style>.jw_over_hidden{overflow: hidden;height:'+wh+'px}</style></div>');
 			$().ready(function(){
 				$(document.body).append(over).addClass('jw_over_hidden');
