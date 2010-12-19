@@ -24,9 +24,12 @@ window.jw={};
 				  b.css('cursor', 'move');
                 t.css({'opacity':opacity*0.7,'z-index':90000});
                 if(ifr){
-	          		  var h=t.height()-b.outerHeight();
+                	//通过使用timeout修正当窗体大小发生变化时，iframe的高度需要时变化后的高度以保证当前鼠标不进入iframe中
+                	setTimeout(function(){
+	          		  var h=ifr.height();
 	          		  over=$("<div style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
 	          		  ifr.after(over);
+                	},1);
 	          	  };
                 $(window).mousemove(function(e1){
                      if(moving){
@@ -54,15 +57,16 @@ window.jw={};
 (function($){
 	function over(opt){
 		opt=opt||'show';
-		var over;
+		var over,wh=$(window).height(),bh=$('body').outerHeight();
 		if(opt=='show'){
-			over=$('<div class="jw_over" ></div>');
+			over=$('<div class="jw_over" ><style>.jw_over_hidden{overflow: hidden;height:'+wh+'px}</style></div>');
 			$().ready(function(){
-				$(document.body).append(over);
+				$(document.body).append(over).addClass('jw_over_hidden');
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
-				over.height(Math.max($('body').outerHeight(),$(window).height()));
+				over.height(bh+wh);
 			});
 		}else{
+			$(document.body).removeClass('jw_over_hidden');
 			$('.jw_over').remove();
 		}
 	}
@@ -143,11 +147,11 @@ window.jw={};
                setSize(null,h);
          } 
          function setPosition(){
-        	 dialog.show();
+        	 dialog.show().animate({opacity:1}).css({opacity:1});
         	 setTimeout(function(){
 	        	 var top=(Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop(),
 	        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
-	                dialog.css({top:top,left:left}).animate({opacity:1});
+	                dialog.css({top:top,left:left});
         	 },100)
            };
            
@@ -164,7 +168,7 @@ window.jw={};
         	   }else{
 	        	   last={top:dialog.css('top'),left:dialog.css('left'),width:dialog.width()};
 	        	   lastHeight=body.height();
-	        	   dialog.css({top:$(window).scrollTop()+1,left:1}).width($(window).width()-15);
+	        	   dialog.css({top:$(window).scrollTop()+1,left:1}).width($(window).width());
 	        	   isMax=true;
 	        	   setSize(null,$(window).height()-55);
         	   }
@@ -218,7 +222,7 @@ window.jw={};
         		e.keyCode==27 && close();
         	});
         }
-//        !!!option.drag && jw.drag(header,dialog);
+        !!!option.drag && jw.drag(header,dialog);
         return dialog;
     }
     window.jw=window.jw||{};
