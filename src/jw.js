@@ -99,9 +99,11 @@ window.jw={};
         		"<tr><td valign='top' id='"+_id+"_bd'></td></tr>" +
         		"<tr class='jw_dialog_tr_last'><td></td><td></td><td></td></tr>" +
         		"</table>");
-        dialog.appendTo(document.body);
+        dialog.appendTo(document.body).hide();
         var body=$('#'+_id+"_bd",dialog);
         var hd=$('#'+_id+"_hd",dialog);
+       
+        dialog.css({top:($(window).height()-180)/2,left:($(window).width()-380)/2,opacity:"0.1"});
         
         if(id){
             body.append($(id));
@@ -140,10 +142,13 @@ window.jw={};
                if(h.indexOf("%")>0)h=($(window).height()*parseFloat(h)/100.0);
                setSize(null,h);
          } 
-         var setPosition=function(){
-        	 var top=(Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop(),
-        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
-                dialog.css({top:top,left:left}).show();
+         function setPosition(){
+        	 dialog.show();
+        	 setTimeout(function(){
+	        	 var top=(Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop(),
+	        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
+	                dialog.css({top:top,left:left}).animate({opacity:1});
+        	 },100)
            };
            
           var isMax=false,last={},lastHeight=0;
@@ -159,9 +164,9 @@ window.jw={};
         	   }else{
 	        	   last={top:dialog.css('top'),left:dialog.css('left'),width:dialog.width()};
 	        	   lastHeight=body.height();
-	        	   dialog.css({top:$(window).scrollTop(),left:1}).width($(window).width()-5);
+	        	   dialog.css({top:$(window).scrollTop()+1,left:1}).width($(window).width()-15);
 	        	   isMax=true;
-	        	   setSize(null,$(window).height()-5);
+	        	   setSize(null,$(window).height()-55);
         	   }
         	   typeof option.maxFn=='function' && option.maxFn();
             };
