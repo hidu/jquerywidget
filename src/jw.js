@@ -19,7 +19,6 @@ window.jw={};
       b.mousedown(function(e){
                 x= e.clientX;
                 y= e.clientY;
-                
                 moving=true;
 				  b.css('cursor', 'move');
                 t.css({'opacity':opacity*0.7,'z-index':90000});
@@ -68,7 +67,7 @@ window.jw={};
 			});
 		}else{
 			$(document.body).removeClass('jw_over_hidden');
-			$('.jw_over').remove();
+			setTimeout(function(){$('.jw_over').remove();},1);
 		}
 	}
 /**
@@ -109,7 +108,6 @@ window.jw={};
         var hd=$('#'+_id+"_hd",dialog);
        
         dialog.css({top:($(window).height()-180)/2,left:($(window).width()-380)/2,opacity:"0.1"});
-        
         if(id){
             body.append($(id));
         }
@@ -144,11 +142,11 @@ window.jw={};
         setSize();
         if(option.height){
                var h=option.height;
-               if(h.indexOf("%")>0)h=($(window).height()*parseFloat(h)/100.0);
+               if((h+"").indexOf("%")>0)h=($(window).height()*parseFloat(h)/100.0);
                setSize(null,h);
          } 
          function setPosition(){
-        	 dialog.show().animate({opacity:1}).css({opacity:1});
+        	 dialog.show().css({opacity:1});
         	 setTimeout(function(){
 	        	 var top=(Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop(),
 	        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
@@ -181,7 +179,7 @@ window.jw={};
          if(option.rel){
              body.empty();
             if(option.iframe){
-            	var ifr=$("<iframe class='jw_dialog_ifr' src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
+            	var ifr=$("<iframe class='jw_dialog_ifr iframe' src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
             	ifr.appendTo(body);
             	 ifr.load(function(){
             		 var c=null,newHeight=0,newWidth=0;
