@@ -9,13 +9,13 @@
              <input type="hidden" name="picInfo[0][picName]" id="picName_0" class='parentPicForm_0 picName' ><input type="hidden" name="picInfo[0][pictureID]" id="pictureID_0"  class='parentPicForm_0 pictureID' ><input type="hidden" name="picInfo[0][albumID]" id="albumID_0"  class="parentPicForm_0" ><input type="hidden" name="picInfo[0][isPrimary]" id="isPrimary_0"  class="parentPicForm_0 isPrimary" ><input type="hidden" name="picInfo[0][thumbPath]" id="thumbPath_0"  class="parentPicForm_0 thumbPath" ><input type="hidden" name="picInfo[0][albumName]" id="albumName_0"  class="parentPicForm_0 albumName" ><input type="hidden" name="picInfo[1][picName]" id="picName_1" class='parentPicForm_1 picName' ><input type="hidden" name="picInfo[1][pictureID]" id="pictureID_1"  class='parentPicForm_1 pictureID' ><input type="hidden" name="picInfo[1][albumID]" id="albumID_1"  class="parentPicForm_1" ><input type="hidden" name="picInfo[1][isPrimary]" id="isPrimary_1"  class="parentPicForm_1 isPrimary" ><input type="hidden" name="picInfo[1][thumbPath]" id="thumbPath_1"  class="parentPicForm_1 thumbPath" ><input type="hidden" name="picInfo[1][albumName]" id="albumName_1"  class="parentPicForm_1 albumName" ><input type="hidden" name="picInfo[2][picName]" id="picName_2" class='parentPicForm_2 picName' ><input type="hidden" name="picInfo[2][pictureID]" id="pictureID_2"  class='parentPicForm_2 pictureID' ><input type="hidden" name="picInfo[2][albumID]" id="albumID_2"  class="parentPicForm_2" ><input type="hidden" name="picInfo[2][isPrimary]" id="isPrimary_2"  class="parentPicForm_2 isPrimary" ><input type="hidden" name="picInfo[2][thumbPath]" id="thumbPath_2"  class="parentPicForm_2 thumbPath" ><input type="hidden" name="picInfo[2][albumName]" id="albumName_2"  class="parentPicForm_2 albumName" ><input type="hidden" name="picInfo[3][picName]" id="picName_3" class='parentPicForm_3 picName' ><input type="hidden" name="picInfo[3][pictureID]" id="pictureID_3"  class='parentPicForm_3 pictureID' ><input type="hidden" name="picInfo[3][albumID]" id="albumID_3"  class="parentPicForm_3" ><input type="hidden" name="picInfo[3][isPrimary]" id="isPrimary_3"  class="parentPicForm_3 isPrimary" ><input type="hidden" name="picInfo[3][thumbPath]" id="thumbPath_3"  class="parentPicForm_3 thumbPath" ><input type="hidden" name="picInfo[3][albumName]" id="albumName_3"  class="parentPicForm_3 albumName" >
              -->
              <textarea name="test[]"></textarea>
-        <!--     <textarea name="test[]"></textarea> -->
+             <textarea name="test[]"></textarea> 
+             <textarea name="test1"></textarea> 
              <input type="button" onclick="test()" value="test">
 </form>
 <script>
 function test(){
   var a=$('#form1 :input').serializeArray();
-  console.log(a);
   var b=jsonForm(a);
   console.log(b);
 }
