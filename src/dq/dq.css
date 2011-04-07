@@ -1,0 +1,41 @@
+
+.dq_ajaxLoding{margin-left: 40%;display: inherit;}
+.dq_loadingImg{background-image: url(loading36.gif);display: inherit;width:128px;height:15px;}
+
+/*dq.trSelect*/
+table tr.dq_select{background: #CFE7FF;}
+
+
+/*
+.dq_Tb{ border-collapse:collapse; width:100%; border:1px #1a6fc6 solid;}
+.dq_Tb tr{ border-collapse:collapse;border:1px #DFEFFF dashed;}
+.dq_Tb th{ height:22px; line-height:22px;}
+.Tb th{ text-align:right;padding-right:5px;background-color:#F8FBFF;}
+.dq_Tb th{ text-align:right;padding-right:5px;background-color:#CFE7FF;}
+.dq_Tb thead{ text-align:center }
+.dq_Tb thead th{background-color:#1a6fc6; color:#fff;  text-align:center }
+.dq_Tb thead th a{color:#fff;padding: 0 2px 0 2px}
+.dq_Tb td{ border:1px #DFEFFF dashed;}
+.dq_Tb input{ margin-left:0 }
+.dq_Tb td{padding:0 5px; text-align: left;height: 30px;}
+.dq_Tb tfoot td{padding-top: 10px;}
+
+.dq_Tbline tr,.dq_Tbline td{border:1px #1a6fc6 solid;}
+.dq_Tbline thead th{border:1px white solid;}
+
+
+.dq_pager { font-size: 12px;font-weight: bold;height:20px;padding: 8px 5px 6px; float: right;}
+.dq_pager ul {list-style: none;margin: 0px;padding: 0px;}
+.dq_pager li { list-style: none; margin: 0px;display: block; float: left; margin-left: 2px; margin-right: 2px;line-height: 14px;}
+.dq_pager li.disabled { border: 1px solid #DDDDDD; padding: 2px 6px 2px 6px; color: #ccc;}
+.dq_pager li.totalInfo { border: 1px solid #DDDDDD;padding: 2px 6px 2px 6px;color: #2E6AB1;}
+.dq_pager li.current {border: 1px solid #2E6AB1;  background-color: #2E6AB1;color: #fff;}
+.dq_pager li.none {border: 1px none;padding: 2px 6px 2px 6px;}
+.dq_pager li a { border: 1px solid #9AAFE5; padding: 2px 6px 2px 6px; display: block;text-decoration: none;}
+.dq_pager li a:hover { border: 1px solid #2E6AB1;}
+*/
+
+.dq_dialog_over {position:absolute;top:0;left:0;width:100%;background-color:#000;z-index:300;display:block; filter: alpha(opacity=30);-moz-opacity: 0.3;opacity: 0.3; }
+.dq_dialog{position:absolute;width:380px;border:1px solid #666;background:#fff;z-index:301;}
+.dq_dialog_title{background:#0066CC;color:#FFFFFF;font-weight:bold;padding:5px 10px;}
+.dq_dialog_title a{color:white;}
