@@ -8,6 +8,7 @@
 * 20101208  dialog  添加了close 事件
 * 20101231  ajax load 给内容添加close事件支持
 *20110407  loadHref判断链接是否存在
+*20110419    ajaxFile支持file标签 多文件选择
 * @copyright duwei
 * @author duwei<duv123@gmail.com>
  */
@@ -17,7 +18,7 @@
        *版本号
        */
        toString:function(){
-           return "DuWei Ajax util 2011-04-07";
+           return "DuWei Ajax util 2011-04-19";
        },
        /**
        *在ajax load 数据的时候，使用该方法将目标显示正在装载的动画效果
@@ -71,14 +72,19 @@
      * @param targetID  显示目标ID  eg: '#retDiv'
      * @param sucFn  成功后执行的函数
      * @param ext  其他参数
-     *@param ext.debug  boolean  是否开启调试
      *@param ext.validate boolean 是否使用$.validate 插件进行表单验证
      *@param ext.reload  boolean  当使用ajax 表单查询的时候，是否在现实位置添加[刷新列表]的 链接（ajax刷新当前页）
      *@param ext.validateRule object $.Validate 的验证规则
      *@param ext.beforeFn function  发送请求前的自定义回调函数 返回 false 将终止动作
      */
     ajaxSubmit:function(formID,targetID,sucFn,ext){
-        ext=ext||{debug:false,validate:false,reload:false};
+        if($.isFunction(targetID)){
+	        	ext=sucFn;
+	        	sucFn=targetID;
+	        	targetID=null;
+	       } 	
+        ext=ext||{reload:false};
+         
         var that=this,
             form=$(formID),
             resetBt=form.find(':reset'),
@@ -103,15 +109,14 @@
         
         //before ajax submit function
         var showRequest=function(formData, jqForm, options) {
-            if($.isFunction(ext.beforeFn) && false===ext.beforeFn(jqForm)){
-                 return false;
+            if($.isFunction(ext.beforeFn)){
+            	  if(ext.dataType === undefined)ext.dataType='json';
+            	  if(false===ext.beforeFn(jqForm)){
+                   return false;
+            	  }
             }
             submitEnable(false);
             var qstring = $.param(formData);
-            if(ext.debug){
-                var fd='url:' + options.url+'\ntype:'+options.type+'\ndataType :'+options.dataType +'\ndate:'+qstring;
-                alert('\tDQ AjaxForm Debug\n\n'+fd);
-            }
             if(targetID && ext.reload){
                  that.ajaxLoading(targetID);
                 var target=$(targetID);
@@ -136,17 +141,9 @@
             submitEnable(true);
         };
         
-//        var showOk=function(msg){
-//            var  spanAjax=$(formID).find('span._dq_Ajax');
-//            if(spanAjax.size()==0){
-//                spanAjax=$('<span class="_dq_Ajax"/>');
-//                spanAjax.appendTo(formID);
-//            }
-//            that.msg(spanAjax,msg);
-//        };
       
         var options={
-                target:(ext.dataType==null)?targetID:null,
+                target:targetID,
                 beforeSubmit:showRequest,
                 timeout:ext.timeout||30000,
                 dataType:ext.dataType||null,
@@ -163,8 +160,8 @@
   				},
                 error:errorFn
          };
-         //使用 $.validate 进行表单验证
-         if(true==ext.validate){
+         //使用 $.validator 进行表单验证
+         if(ext.validate !== false && $.validator){
              var validateOpt={submitHandler: function() {form.ajaxSubmit(options);}};
              ext.validateOpt  && $.extend(validateOpt, ext.validateOpt);
              ext.validateRule && $.extend(validateOpt,{rules:ext.validateRule});
@@ -407,6 +404,7 @@
 
     /**
      * ajax 上传文件
+     * 不支持一个表单多个file标签
      * 该功能需要 $.form.js
      *@param formID  上传的表单
      *@param beforeFn  上传前执行函数，返回false 中断上传操作
@@ -419,17 +417,32 @@
     ajaxFile:function(formID,beforeFn,sucFn,option){
         option=option||{};
         option.fileExt=option.fileExt||['bmp','jpg','jpeg','png','gif'];
+       
+        var isAllow=function(f){
+        	var i=f.lastIndexOf("."),
+        	ext = i>=0?f.substring(i+1,f.length).toLowerCase():'';
+        	var isOk=$.inArray(ext,option.fileExt)>-1;
+        	if(!isOk) alert("文件:\n"+f+"\n不被支持！\n请选择后缀为"+option.fileExt.join()+"的文件");
+        	return isOk;
+         }
         var  form=$(formID),
            file=form.find(':file'),
+           fobj=file[0],
            checkFileExt=function(){
-                 var f=f=file.val(),
-                     i=f.lastIndexOf("."),
-                     ext = i>=0?f.substring(i+1,f.length).toLowerCase():'';
-                 if($.inArray(ext,option.fileExt)<0){
-                  alert("不支持【"+ext+"】后缀的文件\n请选择 "+option.fileExt.join()+"类型的文件");
-                  file.val("");
-                  return false;
-                }
+        	       if(fobj.multiple){
+        	    	   for(var j=0;j<fobj.files.length;j++){
+        	    		   var _f=fobj.files[j].name;
+        	    		   if(!isAllow(_f)){
+           	        		file.val("");
+           	        		return false;
+           	        	    }
+        	    	    }
+        	        }else{
+        	        	if(!isAllow(file.val())){
+        	        		file.val("");
+        	        		return false;
+        	        	}
+        	        }
                 return true;
            };
          var st=true;//fix ie6 cannot reset file value
@@ -447,14 +460,16 @@
                  if((typeof beforeFn=="function") && false===beforeFn(jqForm)){
                         return false;
                 }
-
            },//endBeforeSubmit
           dataType:option.dataType||"json",
           success:function(data){
              if(typeof sucFn=="function"){
                  sucFn(data,form);
              }
-          }
+            },
+          error:function(xhr, textStatus, errorThrown){
+            	alert("something wrong!\n\n"+xhr.responseText);
+           }
      });//endAjaxForm
       if(option.autoSubmit){
           file.change(function(){st && file.val().length && form.submit();});
