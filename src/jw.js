@@ -334,3 +334,43 @@ window.jw={};
 	 window.jw=window.jw||{};
 	 $.extend(jw,{tip:tip}); 
 })(jQuery);
+
+;(function(){
+	//使ie6 支持 position fixed
+	function position_fixed(target){
+		target=$(target);
+		var ie6=!!window.ActiveXObject && !window.XMLHttpRequest; 
+		if(!ie6)return true;
+		target.css({position:'absolute'});
+		var bottom=parseInt(target.css('bottom'));
+		var top=parseInt(target.css('top'));
+		function listen(){
+			if(bottom){
+    			target.css('top',($(window).height()+$(window).scrollTop()-bottom-40)).show();
+			}else{
+    			target.css('top',($(window).scrollTop()+top)).show();
+			}
+		}
+		$(window).scroll(listen).resize(listen);
+		listen();
+	}
+	$.extend(jw,{position_fixed:position_fixed}); 
+})(jQuery);
+
+;(function(){
+	function msg(message,time){
+		var tmp="<div class='jw-msg'><div class='jw-msg-bd'>"+message+"</div></div>";
+		var div=$(tmp);
+		div.appendTo('body');
+		jw.position_fixed(div);
+		time=time||3000;
+		if(time>0){
+			setTimeout(function(){
+				div.animate({opacity:0},2000,function(){
+					$(this).remove();
+				});
+			},time);
+		}
+	}
+	 $.extend(jw,{msg:msg}); 
+})(jQuery);
