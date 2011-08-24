@@ -14,8 +14,6 @@ window.jw={};
 	  opacity=t.css('opacity')||1.0;
 	  zi=t.css('z-index');
 	  var ifr=t.find('iframe'),over=null;
-	 
-	  
       b.mousedown(function(e){
                 x= e.clientX;
                 y= e.clientY;
@@ -58,22 +56,25 @@ window.jw={};
 		opt=opt||'show';
 		var over,wh=$(window).height(),bh=$('body').outerHeight();
 		if(opt=='show'){
-			if($('.jw_over').length)return;
-			over=$('<div class="jw_over" ><style>.jw_over_hidden{overflow: hidden;height:'+wh+'px}</style></div>');
+			if($('.jw-over').length)return;
+			over=$('<div class="jw-over" ><style>.jw-over-hidden{overflow: hidden;height:'+wh+'px}</style></div>');
 			$().ready(function(){
-				$(document.body).append(over).addClass('jw_over_hidden');
+				$(document.body).append(over).addClass('jw-over-hidden');
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
 				over.height(bh+wh);
 			});
 		}else{
-			$(document.body).removeClass('jw_over_hidden');
-			setTimeout(function(){$('.jw_over').remove();},1);
+			$(document.body).removeClass('jw-over-hidden');
+			setTimeout(function(){$('.jw-over').remove();},1);
 		}
 	}
+	 $.extend(jw,{over:over});
+})(jQuery);
+
+;(function($){	
 /**
     *弹出框
-    *   需要添加指定的样式  .jw_dialog_over  .jw_dialog 
-    *  .jw_dialog_title  可以不添加
+    *  .jw-dialog-title  可以不添加
     * 在dialog 容器内的元素 具有 .close 属性 则click时 可以关闭该dialog
     *@param id                需要以dialog 形式显示的层的 ID
     *@param operate           操作。打开时不需要填写，"close"  关闭指定的dialog
@@ -91,32 +92,32 @@ window.jw={};
     *@param option.closeFn    关闭事件
     */
     function dialog(id,operate,option){
-        var dia=null,option=option||{},operate=operate||"open",_id="jw_dialog_"+new Date().getTime(),header;
+        var dia=null,option=option||{},operate=operate||"open",_id="jw-dialog-"+new Date().getTime(),header;
         if("close"==operate){
-        	$('.jw_dialog').trigger('close');
+        	$('.jw-dialog').trigger('close');
         	return true;
         }
        
-        var dialog=$("<table id='"+_id+"' class='jw_dialog'>" +
-        		"<tr class='jw_dialog_tr_first'><td></td><td></td><td></td></tr>" +
-        		"<tr><td rowspan='2'></td><td id='"+_id+"_hd' valign='top' class='jw_dialog_header'></td><td rowspan='2'></td></tr>" +
+        var dialog=$("<table id='"+_id+"' class='jw-dialog'>" +
+        		"<tr class='jw-dialog-tr_first'><td></td><td></td><td></td></tr>" +
+        		"<tr><td rowspan='2'></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'></td></tr>" +
         		"<tr><td valign='top' id='"+_id+"_bd'></td></tr>" +
-        		"<tr class='jw_dialog_tr_last'><td></td><td></td><td></td></tr>" +
+        		"<tr class='jw-dialog-tr_last'><td></td><td></td><td></td></tr>" +
         		"</table>");
-        dialog.appendTo(document.body).hide();
+        dialog.prependTo(document.body).hide();
         var body=$('#'+_id+"_bd",dialog);
         var hd=$('#'+_id+"_hd",dialog);
        
-        dialog.css({top:($(window).height()-180)/2,left:($(window).width()-380)/2,opacity:"0.1"});
+        dialog.css({left:($(window).width()-380)/2});
         if(id){
             body.append($(id));
         }
-        if(option.over!=false){over();}
+        if(option.over!=false){jw.over();}
 
         if(option.title!==false){
         	   var _div="<div style='float:right'><a href='javascript:;'  style='text-decoration:none;outline:medium none;'";
-              header="<div class='jw_dialog_title'>"+
-                         "<div style='float:left;width:auto' class='jw_title'>"+(option.title||'')+"</div>";
+              header="<div class='jw-dialog-title'>"+
+                         "<div style='float:left;width:auto' class='jw-title'>"+(option.title||'')+"</div>";
              option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></div>");
              option.max!=false && (header+=_div+" class='max'>max</a>&nbsp;&nbsp;</div>");
              header+="<div style='clear:both'></div></div>";
@@ -125,51 +126,53 @@ window.jw={};
          }
         
         function setTitle(title){
-        	 if(option.title!==false)header.find('.jw_title').text(title);
+        	 if(option.title!==false)header.find('.jw-title').text(title);
          }
         var setSize=function(width,height){
-        	width  !=null && dialog.width(Math.max(dialog.outerWidth(),380,width||0));
-        	if(height !=null){
-        		if(option.iframe){
-        			setTimeout(function(){
-        				body.find('.jw_dialog_ifr').height(Math.max(height,140));
-        			},10);
-        		}else{
-        			body.height(Math.max(height,140));
-        		}
-        	} 
+        	width  && dialog.animate({width:width});
+        	if(!height)return;
+    		if(option.iframe){
+    			setTimeout(function(){
+    				body.find('.jw-dialog-ifr').animate({height:Math.max(height,140)},setPosition);
+    			},10);
+    		}else{
+    			body.animate({height:Math.max(height,140)});
+    		}
         }
-        setSize();
         if(option.height){
                var h=option.height;
                if((h+"").indexOf("%")>0)h=($(window).height()*parseFloat(h)/100.0);
                setSize(null,h);
          } 
          function setPosition(){
-        	 dialog.show().css({opacity:1});
         	 setTimeout(function(){
-	        	 var top=(Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop(),
+	        	 var top=((Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop())*0.75,
 	        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
-	                dialog.css({top:top,left:left});
-        	 },100)
+	                dialog.css({left:left}).animate({opacity:"show",top:top});
+        	 },11);
            };
            
-          var isMax=false,last={},lastHeight=0;
+          var isMax=false,last={},lastHeight=0,lastMaxClickTime=0;
           var close=function(){
-          	     over('close');
+          	     jw.over('close');
                dialog.remove();
                typeof option.closeFn=='function'&& option.closeFn();
            },max=function(){
+        	   var cTime=new Date().getTime();
+        	   if(cTime-lastMaxClickTime<1000){
+        				  return false;
+        		  }
+        	   lastMaxClickTime=cTime;
         	   if(isMax){
-        		   dialog.css(last);
-        		   isMax=false;
+        		   dialog.animate(last);
         		   setSize(null,lastHeight);
+        		   isMax=false;
         	   }else{
+        		   isMax=true;
 	        	   last={top:dialog.css('top'),left:dialog.css('left'),width:dialog.width()};
 	        	   lastHeight=body.height();
-	        	   dialog.css({top:$(window).scrollTop()+1,left:1}).width($(window).width());
-	        	   isMax=true;
-	        	   setSize(null,$(window).height()-55);
+	        	   dialog.animate({top:$(window).scrollTop()+1,left:1,width:$(window).width()});
+	        	   setSize(0,$(window).height()-55);
         	   }
         	   typeof option.maxFn=='function' && option.maxFn();
             };
@@ -179,8 +182,9 @@ window.jw={};
          if(option.rel){
              body.empty();
             if(option.iframe){
-            	var ifr=$("<iframe class='jw_dialog_ifr iframe' src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
+            	var ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
             	ifr.appendTo(body);
+            	dialog.show();
             	 ifr.load(function(){
             		 var c=null,newHeight=0,newWidth=0;
             		  try{
@@ -204,7 +208,7 @@ window.jw={};
                          c.find('.close').click(close).end().find('.max').click(max);
                          setPosition();
             		});
-                setPosition();
+                
             }else{
                 body.load(option.rel,setPosition);
             }
@@ -212,7 +216,7 @@ window.jw={};
         	 setPosition();
          }
          
-        var fn=function(){setPosition();over();};
+        var fn=function(){setPosition();jw.over();};
         $(window).resize(fn);
         option.fixed && $(window).scroll(setPosition);
         dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
@@ -241,9 +245,9 @@ window.jw={};
     	var x=ico[0],y=ico.length==2?ico[1]:1;
     	var id="jwalert"+new Date().getTime();
     	var style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;";
-    	var code="<div class='jw_alert'>" +
+    	var code="<div class='jw-alert'>" +
 	    			"<table style='width:100%'>" +
-	    			"<tr><td width='60'><div class='jw_icon' style='"+style+"'></div></td><td>"+(text||'')+"</td></tr>" +
+	    			"<tr><td width='60'><div class='jw-icon' style='"+style+"'></div></td><td>"+(text||'')+"</td></tr>" +
 	    			"</table><center>" +
 	    			"<input type='button' value='&nbsp;确 定&nbsp;' id='"+id+"_ok' />";
 			if(!!ext.cannel){
@@ -330,7 +334,6 @@ window.jw={};
 		});
 		
 	}
-	
 	 window.jw=window.jw||{};
 	 $.extend(jw,{tip:tip}); 
 })(jQuery);
