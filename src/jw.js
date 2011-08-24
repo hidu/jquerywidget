@@ -361,7 +361,7 @@ window.jw={};
 	function msg(message,time,callFn){
 		var tmp="<div class='jw-msg'><div class='jw-msg-bd'>"+message+"</div></div>";
 		var div=$(tmp);
-		div.appendTo('body');
+		div.appendTo('body').css('opacity',0.1).animate({opacity:0.8});
 		jw.position_fixed(div);
 		if($.isFunction(time)){
 			callFn=time;
