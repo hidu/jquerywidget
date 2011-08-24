@@ -14,41 +14,31 @@ window.jw={};
 	  opacity=t.css('opacity')||1.0;
 	  zi=t.css('z-index');
 	  var ifr=t.find('iframe'),over=null;
-	  var lastTime=0,timer=null;
-	  //使用timeout 来 防止 dblclick 触发 mousedown 
       b.mousedown(function(e){
-           	  var cTime=new Date().getTime();
-           	  console.log(cTime-lastTime);
-           	  if(cTime-lastTime<300){
-           		  clearTimeout(timer);         		  
-           		  return false;
-             	  }
-           	  lastTime=cTime;
-           	  timer=setTimeout(function(){
-	                x= e.clientX;
-	                y= e.clientY;
-	                moving=true;
-					  b.css('cursor', 'move');
-	                t.css({'opacity':opacity*0.7,'z-index':90000});
-	                if(ifr){
-	                	//通过使用timeout修正当窗体大小发生变化时，iframe的高度需要时变化后的高度以保证当前鼠标不进入iframe中
-	                	setTimeout(function(){
-		          		  var h=ifr.height();
-		          		  over=$("<div style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
-		          		  ifr.after(over);
-	                	},1);
-		          	  };
-	                $(window).mousemove(function(e1){
-	                     if(moving){
-	                       var offset=t.offset();
-	                        t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
-	                        x=e1.clientX;
-	                        y=e1.clientY;
-	                        }
-	                     return false;
-	                }).mouseup(stop);
-	            return false;    
-	           	 },300);
+    	  console.log(e);
+            x= e.clientX;
+            y= e.clientY;
+            moving=true;
+			  b.css('cursor', 'move');
+            t.css({'opacity':opacity*0.7,'z-index':90000});
+            if(ifr){
+            	//通过使用timeout修正当窗体大小发生变化时，iframe的高度需要时变化后的高度以保证当前鼠标不进入iframe中
+            	setTimeout(function(){
+          		  var h=ifr.height();
+          		  over=$("<div style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
+          		  ifr.after(over);
+            	},1);
+          	  };
+            $(window).mousemove(function(e1){
+                 if(moving){
+                   var offset=t.offset();
+                    t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
+                    x=e1.clientX;
+                    y=e1.clientY;
+                    }
+                 return false;
+            }).mouseup(stop);
+        return false;    
       }).mouseup(stop);
       function stop(e){
          moving=false;
@@ -171,7 +161,7 @@ window.jw={};
            },max=function(e){
         	   if(e)e.stopPropagation();
         	   var cTime=new Date().getTime();
-        	   if(cTime-lastMaxClickTime<100){
+        	   if(cTime-lastMaxClickTime<300){
         				  return false;
         		  }
         	   lastMaxClickTime=cTime;
@@ -189,7 +179,7 @@ window.jw={};
         	   typeof option.maxFn=='function' && option.maxFn();
             };
          
-         if(option.title!=false && !option.max)header.dblclick(max);
+//         if(option.title!=false && !option.max)header.dblclick(max);
            
          if(option.rel){
              body.empty();
