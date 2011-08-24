@@ -358,17 +358,24 @@ window.jw={};
 })(jQuery);
 
 ;(function(){
-	function msg(message,time){
+	function msg(message,time,callFn){
 		var tmp="<div class='jw-msg'><div class='jw-msg-bd'>"+message+"</div></div>";
 		var div=$(tmp);
 		div.appendTo('body');
 		jw.position_fixed(div);
+		if($.isFunction(time)){
+			callFn=time;
+			time=0;
+		}
 		time=time||3000;
 		if(time>0){
 			setTimeout(function(){
 				div.animate({opacity:0},2000,function(){
 					$(this).remove();
 				});
+				if($.isFunction(callFn)){
+					callFn();
+				}
 			},time);
 		}
 	}
