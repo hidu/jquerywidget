@@ -14,30 +14,41 @@ window.jw={};
 	  opacity=t.css('opacity')||1.0;
 	  zi=t.css('z-index');
 	  var ifr=t.find('iframe'),over=null;
+	  var lastTime=0,timer=null;
+	  //使用timeout 来 防止 dblclick 触发 mousedown 
       b.mousedown(function(e){
-                x= e.clientX;
-                y= e.clientY;
-                moving=true;
-				  b.css('cursor', 'move');
-                t.css({'opacity':opacity*0.7,'z-index':90000});
-                if(ifr){
-                	//通过使用timeout修正当窗体大小发生变化时，iframe的高度需要时变化后的高度以保证当前鼠标不进入iframe中
-                	setTimeout(function(){
-	          		  var h=ifr.height();
-	          		  over=$("<div style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
-	          		  ifr.after(over);
-                	},1);
-	          	  };
-                $(window).mousemove(function(e1){
-                     if(moving){
-                       var offset=t.offset();
-                        t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
-                        x=e1.clientX;
-                        y=e1.clientY;
-                        }
-                     return false;
-                }).mouseup(stop);
-            return false;    
+           	  var cTime=new Date().getTime();
+           	  console.log(cTime-lastTime);
+           	  if(cTime-lastTime<300){
+           		  clearTimeout(timer);         		  
+           		  return false;
+             	  }
+           	  lastTime=cTime;
+           	  timer=setTimeout(function(){
+	                x= e.clientX;
+	                y= e.clientY;
+	                moving=true;
+					  b.css('cursor', 'move');
+	                t.css({'opacity':opacity*0.7,'z-index':90000});
+	                if(ifr){
+	                	//通过使用timeout修正当窗体大小发生变化时，iframe的高度需要时变化后的高度以保证当前鼠标不进入iframe中
+	                	setTimeout(function(){
+		          		  var h=ifr.height();
+		          		  over=$("<div style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
+		          		  ifr.after(over);
+	                	},1);
+		          	  };
+	                $(window).mousemove(function(e1){
+	                     if(moving){
+	                       var offset=t.offset();
+	                        t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
+	                        x=e1.clientX;
+	                        y=e1.clientY;
+	                        }
+	                     return false;
+	                }).mouseup(stop);
+	            return false;    
+	           	 },300);
       }).mouseup(stop);
       function stop(e){
          moving=false;
@@ -99,10 +110,10 @@ window.jw={};
         }
        
         var dialog=$("<table id='"+_id+"' class='jw-dialog'>" +
-        		"<tr class='jw-dialog-tr_first'><td></td><td></td><td></td></tr>" +
-        		"<tr><td rowspan='2'></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'></td></tr>" +
+        		"<tr><td><div class='jw-dialog-top-left'></div></td><td><div class='jw-dialog-top'></div></td><td><div class='jw-dialog-top-right'></div></td></tr>" +
+        		"<tr><td rowspan='2'><div class='jw-dialog-left'></div></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'><div class='jw-dialog-right'></div></td></tr>" +
         		"<tr><td valign='top' id='"+_id+"_bd'></td></tr>" +
-        		"<tr class='jw-dialog-tr_last'><td></td><td></td><td></td></tr>" +
+        		"<tr><td><div class='jw-dialog-bottom-left'></div></td><td><div class='jw-dialog-bottom'></div></td><td><div class='jw-dialog-bottom-right'></div></td></tr>" +
         		"</table>");
         dialog.prependTo(document.body).hide();
         var body=$('#'+_id+"_bd",dialog);
@@ -157,9 +168,10 @@ window.jw={};
           	     jw.over('close');
                dialog.remove();
                typeof option.closeFn=='function'&& option.closeFn();
-           },max=function(){
+           },max=function(e){
+        	   if(e)e.stopPropagation();
         	   var cTime=new Date().getTime();
-        	   if(cTime-lastMaxClickTime<1000){
+        	   if(cTime-lastMaxClickTime<100){
         				  return false;
         		  }
         	   lastMaxClickTime=cTime;
