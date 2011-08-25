@@ -1,4 +1,6 @@
-window.jw={};
+window.jw=window.jw||{};
+
+$.extend( window.jw, {version: "1.0"});
 
 /**
  * @author duwei<duv123@gmail.com>
@@ -78,7 +80,6 @@ window.jw={};
     *  .jw-dialog-title  可以不添加
     * 在dialog 容器内的元素 具有 .close 属性 则click时 可以关闭该dialog
     *@param id                需要以dialog 形式显示的层的 ID
-    *@param operate           操作。打开时不需要填写，"close"  关闭指定的dialog
     *@param option.title      标题。当设置为false 时，不显示标题
     *@param option.close      是否显示close 按钮
     *@param option.max        是否显示最大化 按钮
@@ -92,13 +93,16 @@ window.jw={};
     *@param option.maxFn      最大化事件
     *@param option.closeFn    关闭事件
     */
-    function dialog(id,operate,option){
-        var dia=null,option=option||{},operate=operate||"open",_id="jw-dialog-"+new Date().getTime(),header;
-        if("close"==operate){
-        	$('.jw-dialog').trigger('close');
-        	return true;
-        }
-       
+    function dialog(option){
+    	option=$.extend({},{
+	   	     width:400,
+		     height:80,
+		     close:true,
+		     drag:true,
+		     over:true,
+		     title:''
+		},option||{});
+        var _id="jw-dialog-"+new Date().getTime(),header;
         var dialog=$("<table id='"+_id+"' class='jw-dialog'>" +
         		"<tr><td><div class='jw-dialog-top-left'></div></td><td><div class='jw-dialog-top'></div></td><td><div class='jw-dialog-top-right'></div></td></tr>" +
         		"<tr><td rowspan='2'><div class='jw-dialog-left'></div></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'><div class='jw-dialog-right'></div></td></tr>" +
@@ -108,12 +112,11 @@ window.jw={};
         dialog.prependTo(document.body).hide();
         var body=$('#'+_id+"_bd",dialog);
         var hd=$('#'+_id+"_hd",dialog);
+        var ww=$(window).width(),wh=$(window).height();
        
-        dialog.css({left:($(window).width()-380)/2});
-        if(id){
-            body.append($(id));
-        }
-        if(option.over!=false){jw.over();}
+        dialog.css({left:(ww-380)/2});
+        option.id && body.append($(option.id));
+        option.over && jw.over();
 
         if(option.title!==false){
         	   var _div="<div style='float:right'><a href='javascript:;'  style='text-decoration:none;outline:medium none;'";
@@ -122,42 +125,44 @@ window.jw={};
              option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></div>");
              option.max!=false && (header+=_div+" class='max'>max</a>&nbsp;&nbsp;</div>");
              header+="<div style='clear:both'></div></div>";
-              header=$(header);
-              hd.append(header);
+             header=$(header);
+             hd.append(header);
          }
         
         function setTitle(title){
-        	 if(option.title!==false)header.find('.jw-title').text(title);
+        	 option.title!==false && header.find('.jw-title').text(title);
          }
         var setSize=function(width,height){
-        	width  && dialog.animate({width:width});
-        	if(!height)return;
+        	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
+        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
+        	
+        	var h=Math.max(height,140,option.iframe?option.height:0),
+        	    w=Math.max(width,400,option.iframe?option.width:0);
     		if(option.iframe){
     			setTimeout(function(){
-    				body.find('.jw-dialog-ifr').animate({height:Math.max(height,140)},setPosition);
+    				body.find('.jw-dialog-ifr').animate({height:h},setPosition);
     			},10);
     		}else{
-    			body.animate({height:Math.max(height,140)});
+    			body.animate({height:h,width:w});
     		}
-        }
-        if(option.height){
-               var h=option.height;
-               if((h+"").indexOf("%")>0)h=($(window).height()*parseFloat(h)/100.0);
-               setSize(null,h);
-         } 
+        };
+       
          function setPosition(){
         	 setTimeout(function(){
-	        	 var top=((Math.max($(window).height()-dialog.height(),0))/2+$(window).scrollTop())*0.75,
-	        	     left=($(window).width()-dialog.width())/2+$(window).scrollLeft();
-	                dialog.css({left:left}).animate({opacity:"show",top:top});
+	        	 var top=((Math.max(wh-dialog.height(),0))/2+$(window).scrollTop())*0.75,
+	        	     left=(ww-dialog.width())/2+$(window).scrollLeft();
+	                dialog.css({left:left,top:top}).animate({opacity:"show"});
         	 },11);
            };
+          function setBounds(top,left,width,height){
+        	   
+           }
            
           var isMax=false,last={},lastHeight=0,lastMaxClickTime=0;
           var close=function(){
           	     jw.over('close');
+          	     typeof option.closeFn=='function'&& option.closeFn();
                dialog.remove();
-               typeof option.closeFn=='function'&& option.closeFn();
            },max=function(e){
         	   if(e)e.stopPropagation();
         	   var cTime=new Date().getTime();
@@ -173,52 +178,46 @@ window.jw={};
         		   isMax=true;
 	        	   last={top:dialog.css('top'),left:dialog.css('left'),width:dialog.width()};
 	        	   lastHeight=body.height();
-	        	   dialog.animate({top:$(window).scrollTop()+1,left:1,width:$(window).width()});
-	        	   setSize(0,$(window).height()-55);
+	        	   dialog.animate({top:$(window).scrollTop()+1,left:1,width:ww});
+	        	   setSize(0,wh-55);
         	   }
         	   typeof option.maxFn=='function' && option.maxFn();
             };
          
-//         if(option.title!=false && !option.max)header.dblclick(max);
            
          if(option.rel){
-             body.empty();
-            if(option.iframe){
-            	var ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.rel+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
-            	ifr.appendTo(body);
-            	dialog.show();
-            	 ifr.load(function(){
-            		 var c=null,newHeight=0,newWidth=0;
-            		  try{
-                          c=$(this).contents();
-                          if(!c)return;
-                          var ifrTitle=c.attr('title');
-                          if(ifrTitle.length)setTitle(ifrTitle);
-                        	  
-                          newHeight=$('body',c).height();
-                          newWidth=$('html',c).attr('scrollWidth')+10;
-                          var wh=$(window).height(),
-                              ww=$(window).width(),
-                              b1=b2=false;
-                          
-                          if(newHeight>wh){newHeight=wh-52;b1=true;};
-                          if(newWidth>ww){newWidth=ww-10;b2=true};
-                          setSize(newWidth+15,newHeight+30);
-                          (b1 && b2)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
-                         }catch(e){}
-                         
-                         c.find('.close').click(close).end().find('.max').click(max);
-                         setPosition();
-            		});
-                
-            }else{
-                body.load(option.rel,setPosition);
-            }
+             body.empty().load(option.rel,setPosition);
+         }else if(option.iframe){
+         	var ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
+         	ifr.appendTo(body).load(function(){
+         		 var c=null,newHeight=0,newWidth=0;
+         		  try{
+                       c=$(this).contents();
+                       if(!c)return;
+                       var ifrTitle=c.attr('title');
+                       if(ifrTitle.length)setTitle(ifrTitle);
+                     	  
+                       newHeight=$('body',c).height();
+                       newWidth=$('html',c).attr('scrollWidth')+10;
+                       var b1=b2=false;
+                       
+                       if(newHeight>wh){newHeight=wh-52;b1=true;};
+                       if(newWidth>ww){newWidth=ww-10;b2=true};
+                       setSize(newWidth+15,newHeight+30);
+                       (b1 && b2)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
+                      }catch(e){}
+                      
+                      c.find('.close').click(close).end().find('.max').click(max);
+                      setPosition();
+         		});
+          	dialog.show();
+         	 setPosition();
+             
          }else{
         	 setPosition();
          }
          
-        var fn=function(){setPosition();jw.over();};
+        var fn=function(){setPosition();dialog.is(":visiable")&&jw.over();};
         $(window).resize(fn);
         option.fixed && $(window).scroll(setPosition);
         dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
@@ -228,7 +227,7 @@ window.jw={};
         	});
         }
         !!!option.drag && jw.drag(header,dialog);
-        return dialog;
+        return {close:close};
     }
     window.jw=window.jw||{};
     $.extend(jw,{dialog:dialog}); 
@@ -257,17 +256,19 @@ window.jw={};
 			}
 	    	code+="</center></div>";
     	var div=$(code);
+    	var ja=null;
     	div.appendTo(document.body);
     	var call_bk=function(fn){
     		if(ext){
     			var rt=(typeof fn=='function'?fn:(typeof ext=='function'?ext:function(){}))();
     			if(rt===false)return;
     		} 
-    		dialog(div,'close');
+    		ja.close();
+    		console.log(ja);
     	}
     	$('#'+id+"_ok").click(function(){call_bk(ext.okFn)});
     	$('#'+id+"_cannel").click(function(){call_bk(ext.cannel)});
-    	dialog(div,"open",{max:false,title:title||'提示',fixed:false});
+    	ja=dialog({id:div,max:false,title:title||'提示',fixed:false});
       };
     $.extend(jw,{alert:jwalert}); 
 })(jQuery);
