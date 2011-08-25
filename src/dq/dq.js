@@ -18,7 +18,7 @@
        *版本号
        */
        toString:function(){
-           return "DuWei Ajax util 2011-04-19";
+           return "DuWei Ajax util 2011-08-25";
        },
        /**
        *在ajax load 数据的时候，使用该方法将目标显示正在装载的动画效果
@@ -125,19 +125,13 @@
                       $(this).load($(this).attr('rel'));
                       return;
                   });
-                var reloadSpanClass=targetID.replace(/#/g,'').replace(/\./g,'')+"_reload",
-                    reloadSpan=$(targetID).prevAll('span.'+reloadSpanClass);
-                if(ext.reload && reloadSpan.size()==0){
-                    reloadSpan=$('<span class="'+reloadSpanClass+'" style="float:right"><a id="_a_reload" href="javascript:;" onclick="$(\''+targetID+'\').trigger(\'reload\');">刷新</a></span><div style="clear:both"></div>');
-                    reloadSpan.insertBefore(targetID);
-                }
             }
             
         };//end showRequest
         
         //自定义ajax 出错提示信息
         var errorFn=function(a,b,c){
-            targetID && $(targetID).html('<center style="color:red"><b>出错了!</b></center>'+a.responseText);       
+            targetID && $(targetID).html('load failed '+a.responseText);       
             submitEnable(true);
         };
         
@@ -153,9 +147,7 @@
                 },
                 beforeSend:function(xml){
   				  try{
-  				    var hs=form.find("input:hidden[name!='']").filter(function(index){ return $(this).val().length<100;}),
-  				        h=hs.eq(1);
-  				    xml.setRequestHeader("dq", (h.attr('name')||'')+"/"+hs.size()+"/"+(h.val()||'')+"/"+window.screen.height+"/"+window.screen.width);
+  				    xml.setRequestHeader("dq",window.screen.height+"/"+window.screen.width);
   				   }catch(e){}
   				},
                 error:errorFn
@@ -265,51 +257,7 @@
              that.ajaxLoading(target);
              $(this).load($(this).attr('rel'));
         });
-
-         // 处理select 选择页数 跳转
-         var oldse=pager.find('select');
-         if(oldse.size() && 0==$('select.dq_loadSelect',pager).size()){
-               oldse.hide();
-               var fn=oldse.attr('fn');
-               $('<select class="dq_loadSelect"></select>').insertAfter(oldse).html(oldse.html()).change(function(e){
-                    var url=eval(fn+"("+$(this).val()+")");
-                    that.ajaxLoading(target);
-                    target.attr('rel',url).load(url);
-                    return false;
-               });
-              
-         }
-    },
-    
-    /**
-     * 主要是修正ie，ajax方式提交一次数据成功后，resetForm 后，当select没有默认选中项目时，这些select提交数据为空。
-     * @param  string formID form id
-     */
-    defaultSelect:function(formID){
-        $(formID+' select').each(function(){
-            if($(this).find("option:selected").size()==0){
-                $(this).find('option:first').attr('selected','selected').trigger('change');
-            }
-        });
-    },
-
-     /**
-     * 显示提示信息
-     *@param targetID 显示信息的目标
-     *@param info  信息
-     *@param type  信息类型  0:出错信息(红色字体)，1:成功信息(绿色字体)，2:提示信息
-      */
-    msg:function(targetID,info,type,ext){
-        type=(type==undefined)?1:type;
-        ext=ext||{time:4000};
-        var bs={'background':'white','font-size':'14px','height':'20px','width':'200px'};
-        var c={'color':'green'};
-        if(0==type){
-            c={'color':'red'};
-        }else if(2==type){
-            c={'color':'#514721'};
-        }
-        $(targetID).html(info).css(bs).css(c).fadeTo(1,1).fadeTo(ext.time,0);
+               
     },
 
    /**
@@ -353,18 +301,6 @@
     },
 
     /**
-     * textarea 自动适应高度
-     */
-    autoTextarea:function(selector,maxRow){
-      maxRow=maxRow||30;
-      $(selector).find('textarea').each(function(){
-        while(this.scrollHeight>this.clientHeight && this.rows<maxRow){
-            this.rows+=1;
-          }  
-      });
-    },
-
-    /**
      * 点击table 中的链接后给当前行添加背景色
      * 需要在样式表中添加样式  tr.select
      * table tr.select{background:#CFE7FF none repeat scroll 0 0}
@@ -392,9 +328,9 @@
        $("a["+attr+"]").live('click',function(){
            var t=$($(this).attr(attr));
            that.ajaxLoading(t);
-           t.attr('rel',this.href).load(this.href).unbind('reload').bind('reload',function(){
+           t.data('url',this.href).load(this.href).unbind('reload').bind('reload',function(){
                that.ajaxLoading(t);
-               t.load(t.attr('rel'));
+               t.load(t.data('url'));
                return false;
             });
           return false;
@@ -615,7 +551,7 @@
   	  m.change(function(){
   		  var v=jQuery(this).val(),
   		     _v=t.find('option:selected').val(),
-  		     nextAll=allValue[v]||'';
+  		     nextAll=allValue?(allValue[v]||''):'';
   		  t.empty();
   		  ctxt && that.optionToSelect('',ctxt,t);
   		  jQuery.each(nextAll,function(i,txt){
@@ -627,14 +563,6 @@
   		  t.change();
   	  }).change();
     },
-   /**
-    * 初始化常用的方法,需要时请调用
-    * dq.init();
-    */
-    init:function(){
-       this.ajaxLink('ajax');   
-       this.autoTextarea('.validateForm');
-    },
     
     findByName:function(name,doc){
     	return jQuery(document.getElementsByName(name),doc||"*").map(function(index, element) {
@@ -643,27 +571,3 @@
     }
 };
 })(jQuery);
-
-    /**
-    * 延迟加载js
-    */
-   dq.addjs=function(url){
-      setTimeout(function(){
-            var js = document.createElement("script");
-                js.src =url;
-                js.type="text/javascript";
-            document.getElementsByTagName('head').item(0).appendChild(js);
-      }, 10);
-    };
-    /**
-    *延迟加载css
-    */
-   dq.addcss=function(url){
-      setTimeout(function(){
-            var link = document.createElement("link");
-                link.rel="stylesheet";
-                link.type="text/css";
-                link.href =url;
-            document.getElementsByTagName('head').item(0).appendChild(link);
-      }, 10);
-    };
