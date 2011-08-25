@@ -364,24 +364,35 @@ window.jw={};
 
 ;(function(){
 	function msg(message,time,callFn){
-		var tmp="<div class='jw-msg'><div class='jw-msg-bd'>"+message+"</div></div>";
-		var div=$(tmp);
-		div.appendTo('body').css('opacity',0.1).animate({opacity:0.8});
-		jw.position_fixed(div);
-		if($.isFunction(time)){
-			callFn=time;
-			time=0;
-		}
-		time=time||3000;
-		if(time>0){
-			setTimeout(function(){
-				div.animate({opacity:0},2000,function(){
-					$(this).remove();
-				});
-				if($.isFunction(callFn)){
-					callFn();
+		function createUI(){
+				var tmp="<div class='jw-msg'><div class='jw-msg-bd'>"+message+"</div></div>";
+				var div=$(tmp);
+				div.appendTo('body').css('opacity',0.1).animate({opacity:0.8});
+				jw.position_fixed(div);
+				if($.isFunction(time)){
+					callFn=time;
+					time=0;
 				}
-			},time);
+				time=time||3000;
+				if($.isFunction(callFn)){
+					div.bind('jw-msg-call',callFn);
+				}
+				if(time>0){
+					setTimeout(function(){
+						div.animate({opacity:0},2000,function(){
+							$(this).remove();
+						}).trigger('jw-msg-call');
+					},time);
+				}
+		}
+		if($('.jw-msg').size()){
+			$('.jw-msg').animate({width:0,height:0,left:$(window).width()/2},
+					function(){
+				$(this).trigger('jw-msg-call').remove();
+				createUI();
+		  });
+		}else{
+			createUI();
 		}
 	}
 	 $.extend(jw,{msg:msg}); 
