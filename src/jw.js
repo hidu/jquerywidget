@@ -3,6 +3,17 @@ window.jw=window.jw||{};
 $.extend( window.jw, {
 	version: "1.0",
 	parseUrl:function(url){
+		 //若是ie浏览器，相对地址 如 jquery/widget.html 并不能正常识别
+		 if($.browser.msie){
+			 var b=/^[A-Za-z]+:/;
+			 if(!b.test(url)){
+				 if(url.substring(0,1)!="/"){
+					 url=location.protocol+"//"+location.host+location.pathname.substring(0,location.pathname.lastIndexOf("/")+1)+url;
+				 }else{
+					 url=location.protocol+"//"+location.host+url;
+				 }
+			 }
+		 }
 		 var a=document.createElement('a');
 		 a.href=url;
 		 var names=['href','protocol','host','hostname','port','pathname','search','hash'],
@@ -63,7 +74,7 @@ $.extend( window.jw, {
          over && over.remove();
          return false;
       }
-    }
+    };
     $.extend(jw,{drag:drag});
 })(jQuery);
 
@@ -74,7 +85,8 @@ $.extend( window.jw, {
 		var over,wh=$(window).height(),bh=$('body').outerHeight();
 		if(opt=='show'){
 			if($('.jw-over').length)return;
-			over=$('<div class="jw-over" ><style>.jw-over-hidden{overflow: hidden;height:'+wh+'px}</style></div>');
+			over=$('<div class="jw-over" ></div>');
+//			over.html('<style>.jw-over-hidden{width:100%;overflow: hidden;height:'+wh+'px}</style>');
 			$().ready(function(){
 				$(document.body).append(over).addClass('jw-over-hidden');
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
@@ -144,18 +156,16 @@ $.extend( window.jw, {
              header=$(header);
              hd.append(header);
          }
-        
         function setTitle(title){
         	 option.title!==false && header.find('.jw-title').text(title);
          }
-     	 var isSameDomain=!!option.id ||!!option.rel;
+     	 var isSameDomain=(!!option.id ||!!option.rel) && !option.iframe;
      	 if(!isSameDomain){
      		 var _ifr_url=jw.parseUrl(option.iframe);
-     		isSameDomain=(_ifr_url['protocol']+_ifr_url['host'])==(location.protocol+location.host);
+     		isSameDomain=_ifr_url['hostname']==location.hostname;
      		_ifr_url=null;
      	 }
-        
-        var setSize=function(width,height){
+        function setSize(width,height){
         	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
         	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
         	
@@ -163,15 +173,16 @@ $.extend( window.jw, {
         };
            
           function autoBounds(_w,_h){
-        	   var h=Math.max(isSameDomain?(_h||dialog.height()):option.height,140);
-     		   var w=Math.max(isSameDomain?(_w||dialog.width()):option.width,140);
+        	   var h=Math.min(Math.max(isSameDomain?(_h||dialog.height()):option.height,140),wh-5);
+     		   var w=Math.min(Math.max(isSameDomain?(_w||dialog.width()):option.width,140),ww);
 	          var top=0.75*(wh-h)/2+$(window).scrollTop(),
 	        	    left=(ww-w)/2+$(window).scrollLeft();
 	             setBounds(top,left,w,h);
            }
            
           function setBounds(top,l,width,height){
-//        	  dialog.animate({opacity:'show',top:top,left:l,width:width},function(){dialog.width(width)});
+        	  width=Math.min(width,ww);
+        	  height=Math.min(height,wh-60);
         	  dialog.css({opacity:0.1}).show().animate({opacity:1,top:top,left:l,width:width});
         	  if(isSameDomain && !option.iframe && !isMax){
         		  body.css('height','auto');
@@ -185,15 +196,18 @@ $.extend( window.jw, {
             }
            
           var last={},lastMaxClickTime=0;
-          var close=function(){
+          function close(e){
+        	   if(e)e.stopPropagation();
           	     jw.over('close');
-          	     if(typeof option.closeFn=='function' && false===option.closeFn()){
+          	     if( $.isFunction(option.closeFn) && false===option.closeFn()){
           	    	 return false; 
           	      };
           	     body.empty().animate({height:0});
           	     dialog.animate({top:wh/2,left:ww/2,width:0,height:0});
-               setTimeout(function(){dialog.remove()},250);;
-           },max=function(e){
+               setTimeout(function(){dialog.remove();},250);;
+           }
+         
+           function max(e){
         	   if(e)e.stopPropagation();
         	   var cTime=new Date().getTime();
         	   if(cTime-lastMaxClickTime<300){
@@ -206,17 +220,19 @@ $.extend( window.jw, {
         	   }else{
         		   isMax=true;
 	        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:body.height()};
-	        	   setBounds(1,$(window).scrollTop(),ww,wh-(dialog.height()-body.height())-5);
+	        	   setBounds(1,$(window).scrollTop(),ww,wh-(dialog.height()-body.height()));
         	   }
         	   typeof option.maxFn=='function' && option.maxFn();
-            };
+            }
+          
          function toCenter(w,h){
         	 w=w||1;
         	 h=h||1;
         	 dialog.css({top:0.75*(wh-h)/2,left:(ww-w)/2,width:w+"px"});
       	     body.height(h);
           }
-         var ifr=null;
+         var ifr;
+         
          if(option.rel){
              body.empty().load(option.rel,function(){
             	 dialog.css({opacity:0.1}).show();
@@ -256,8 +272,8 @@ $.extend( window.jw, {
                if(h>wh){h=wh-52;b++;};
                if(w>ww){w=ww-10;b++;};
                dialog.css({left:ww/2,top:wh/2,width:"1px"});
-               (b>1)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
                setSize(w,h);
+               (b>1)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
                return true;
          	});
           }
@@ -308,10 +324,9 @@ $.extend( window.jw, {
     			if(rt===false)return;
     		} 
     		ja.close();
-    		console.log(ja);
-    	}
-    	$('#'+id+"_ok").click(function(){call_bk(ext.okFn)});
-    	$('#'+id+"_cannel").click(function(){call_bk(ext.cannel)});
+    	};
+    	$('#'+id+"_ok").click(function(){call_bk(ext.okFn);});
+    	$('#'+id+"_cannel").click(function(){call_bk(ext.cannel);});
     	ja=dialog({id:div,max:false,title:title||'提示',fixed:false});
       };
     $.extend(jw,{alert:jwalert}); 
@@ -380,7 +395,7 @@ $.extend( window.jw, {
 			 isOver=false;
 		});
 		
-	}
+	};
 	 window.jw=window.jw||{};
 	 $.extend(jw,{tip:tip}); 
 })(jQuery);
