@@ -146,12 +146,12 @@ $.extend( window.jw, {
         option.over && jw.over();
 
         if(option.title!==false){
-        	   var _div="<span><a href='javascript:;'  style='text-decoration:none;outline:none;'";
+        	   var _div="<span><a href='javascript:;' ";
               header="<div class='jw-dialog-title'><table style='width:100%'><tr><td>"+
-                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='30px'>";
-             option.max!=false && (header+=_div+" class='max'>□</a></span>&nbsp;&nbsp;");
+                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='40px'><nobr>";
+             option.max!=false && (header+=_div+" class='max'>□</a></span>");
              option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></span>");
-             header+="</td></tr></table></div>";
+             header+="</nobr></td></tr></table></div>";
              header=$(header);
              hd.append(header);
          }
@@ -221,6 +221,8 @@ $.extend( window.jw, {
 	        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:body.height()};
 	        	   setBounds(1,$(window).scrollTop(),ww,wh-(dialog.height()-body.height()));
         	   }
+        	   var _max=header.find('.max');
+        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
         	   typeof option.maxFn=='function' && option.maxFn();
             }
           
