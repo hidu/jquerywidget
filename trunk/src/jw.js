@@ -117,18 +117,18 @@ $.extend( window.jw, {
 		     title:''
 		},option||{});
         var _id="jw-dialog-"+new Date().getTime(),header;
-        var dialog=$("<table id='"+_id+"' class='jw-dialog'><tbody class='jw-dialog-tbody'>" +
-        		"<tr><td><div class='jw-dialog-top-left'></div></td><td><div class='jw-dialog-top'></div></td><td><div class='jw-dialog-top-right'></div></td></tr>" +
+        var dialog=$("<table id='"+_id+"' class='jw-dialog'>" +
+        		"<tr class='jw-dialog-top-tr'><td><div class='jw-dialog-top-left'></div></td><td><div class='jw-dialog-top'></div></td><td><div class='jw-dialog-top-right'></div></td></tr>" +
         		"<tr><td rowspan='2'><div class='jw-dialog-left'></div></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'><div class='jw-dialog-right'></div></td></tr>" +
         		"<tr><td valign='top' id='"+_id+"_bd' class='jw-dialog-bd'></td></tr>" +
-        		"<tr><td><div class='jw-dialog-bottom-left'></div></td><td><div class='jw-dialog-bottom'></div></td><td><div class='jw-dialog-bottom-right'></div></td></tr>" +
-        		"</tbody></table>");
+        		"<tr class='jw-dialog-bottom-tr'><td><div class='jw-dialog-bottom-left'></div></td><td><div class='jw-dialog-bottom'></div></td><td><div class='jw-dialog-bottom-right'></div></td></tr>" +
+        		"</table>");
         dialog.appendTo(document.body).hide();
         var body=$('#'+_id+"_bd",dialog);
         var hd=$('#'+_id+"_hd",dialog);
         var ww=$(window).width(),wh=$(window).height();
        
-        dialog.css({left:(ww-option.width)/2,top:0.75*wh/2+$(window).scrollTop()});
+        dialog.css({left:(ww-option.width)/2,top:0.75*wh/2+$(window).scrollTop(),width:380,height:140});
         option.id && body.append($(option.id));
         option.over && jw.over();
 
@@ -137,7 +137,7 @@ $.extend( window.jw, {
               header="<div class='jw-dialog-title'>"+
                          "<div style='float:left;width:auto' class='jw-title'>"+(option.title||'')+"</div>";
              option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></div>");
-             option.max!=false && (header+=_div+" class='max'>max</a>&nbsp;&nbsp;</div>");
+             option.max!=false && (header+=_div+" class='max'>□</a>&nbsp;&nbsp;</div>");
              header+="<div style='clear:both'></div></div>";
              header=$(header);
              hd.append(header);
@@ -232,16 +232,16 @@ $.extend( window.jw, {
 
                var it=c.attr('title');
                if(it.length)setTitle(it);
-             	  
-               h=$('body',c).height();
-               w=$('html',c).width();
-               
+               dialog.width(300);
+               body.height(100);
+               h=c.height()+10;
+               w=c.width()+20;
                var b=0;
                if(h>wh){h=wh-52;b++;};
                if(w>ww){w=ww-10;b++;};
                dialog.css({left:ww/2,top:wh/2,width:"1px"});
                (b>1)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
-               setSize(w,h+20);
+               setSize(w,h);
                return true;
          	});
           }
