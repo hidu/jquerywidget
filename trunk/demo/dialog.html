@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>dialog</title>
 <link rel="stylesheet" type="text/css" media="screen" href="../src/jw.css" />
-<script src="jquery-1.4.4.js"></script>
+<script src="jquery-1.6.2.js"></script>
 
 <script src="../src/jw.js"></script>
 </head>
@@ -15,11 +15,14 @@
 //prompt("还可以");
 jw.msg("还可以");
 var url="http://abc.com:8080/dir/index.html?id=255&m=hello#top";
-var url="/dir/index.html?id=255&m=hello#top";
+//var url="/dir/index.html?id=255&m=hello#top";
 var p=jw.parseUrl(url);
+
 console.log(p);
+
 </script>
 <input type="button" onclick="jw.alert('这是一个alert!','5');" value="alert"><br/>
+<input type="button" onclick="jw.alert('这是一个alert1111111111111111111!','5');" value="alert"><br/>
 
 <input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800});" value="dialog idrame">
 
