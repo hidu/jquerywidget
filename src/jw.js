@@ -37,7 +37,11 @@ $.extend( window.jw, {
 (function($){
   var  drag=function(bar,target){
      var b=$(bar),t=target?$(target):b,x,y,moving=false,opacity,zi;
-	  t.css('position','absolute');
+      var _p=t.css('position');
+      if(_p!='absolute' && _p!='fixed'){
+    	  t.css('position','absolute');
+      }
+      _p=null;
 	  var ifr=t.find('iframe'),over=null;
       b.mousedown(function(e){
     	  zi=zi||t.css('z-index');
@@ -148,7 +152,7 @@ $.extend( window.jw, {
         if(option.title!==false){
         	   var _div="<span><a href='javascript:;' ";
               header="<div class='jw-dialog-title'><table style='width:100%'><tr><td>"+
-                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='40px'><nobr>";
+                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='55px' style='text-align:right'><nobr>";
              option.max!=false && (header+=_div+" class='max'>□</a></span>");
              option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></span>");
              header+="</nobr></td></tr></table></div>";
