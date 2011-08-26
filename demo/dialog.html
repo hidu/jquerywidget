@@ -13,7 +13,11 @@
 //jw.alert('asdasd',"3x2");
 //jw.alert('您认为如何呢？<input type="text" id="b" style="width:500px">',"3x2","",{cannel:true,okFn:function(){alert($('#b').val())}});
 //prompt("还可以");
-jw.msg("还可以",function(){alert(1)});
+jw.msg("还可以");
+var url="http://abc.com:8080/dir/index.html?id=255&m=hello#top";
+var url="/dir/index.html?id=255&m=hello#top";
+var p=jw.parseUrl(url);
+console.log(p);
 </script>
 <input type="button" onclick="jw.alert('这是一个alert!','5');" value="alert"><br/>
 
