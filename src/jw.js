@@ -3,23 +3,17 @@ window.jw=window.jw||{};
 $.extend( window.jw, {
 	version: "1.0",
 	parseUrl:function(url){
-	var a=/^([A-Za-z]+):(\/{0,3})/;
-	if(!a.test(url)){
-		url=location.protocol+"//"+location.host+"/"+url;
-	}
-	 var reg=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
-	 var reg_result=reg.exec(url);
-	 var names=['href','protocol','slash','hostname','port','pathname','query','hash'];
-	 var result={};
-	 var i;
-	 for(i=0;i<names.length;i++){
-		 result[names[i]]=reg_result[i];
-	 }
-	 result['port']=result['port']||80;
-	 result['protocol']=(result['protocol']||"http")+":";
-	 result['host']=(result['protocol']+result['port'])=="http:80"?result['hostname']:(result['hostname']+":"+result['port']);
-	 result['hash']=(result['hash']+"").length?"#"+result['hash']:"";
-	 return result;
+		 var a=document.createElement('a');
+		 a.href=url;
+		 var names=['href','protocol','host','hostname','port','pathname','search','hash'],
+		     result={},
+		      i;
+		 for(i=0;i<names.length;i++){
+			 result[names[i]]=a[names[i]];
+		 }
+		 result['query']=result['search'].replace(/^\?/,'');
+		 a=null;
+		 return result;
     }
 });
 
@@ -212,7 +206,7 @@ $.extend( window.jw, {
          	var ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
          	ifr.appendTo(body);
          	var _ifr_url=jw.parseUrl(option.iframe);
-         	var _is_sameDomain=(_ifr_url['protocol']+_ifr_url['host'])==(location.protocol+location.hostname+(location.port));
+         	var _is_sameDomain=(_ifr_url['protocol']+_ifr_url['host'])==(location.protocol+location.host);
          	_is_sameDomain && ifr.load(function(){
          		 var c=null,newHeight=0,newWidth=0;
          		  try{
@@ -369,7 +363,7 @@ $.extend( window.jw, {
 	//使ie6 支持 position fixed
 	function position_fixed(target){
 		target=$(target);
-		var ie6=!!window.ActiveXObject && !window.XMLHttpRequest; 
+		var ie6=$.browser.msie && $.browser.version<=6; 
 		if(!ie6)return true;
 		target.css({position:'absolute'});
 		var bottom=parseInt(target.css('bottom'));
