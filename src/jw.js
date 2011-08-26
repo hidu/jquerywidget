@@ -37,12 +37,11 @@ $.extend( window.jw, {
 (function($){
   var  drag=function(bar,target){
      var b=$(bar),t=target?$(target):b,x,y,moving=false,opacity,zi;
-      
 	  t.css('position','absolute');
 	  var ifr=t.find('iframe'),over=null;
       b.mousedown(function(e){
-    	  zi=t.css('z-index');
-    	  opacity=t.css('opacity')||1.0;
+    	  zi=zi||t.css('z-index');
+    	  opacity=opacity||t.css('opacity')||1.0;
             x= e.clientX;
             y= e.clientY;
             moving=true;
@@ -56,7 +55,7 @@ $.extend( window.jw, {
           		  ifr.after(over);
             	},1);
           	  };
-            $(window).mousemove(function(e1){
+            $(document.body).mousemove(function(e1){
                  if(moving){
                    var offset=t.offset();
                     t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
@@ -147,12 +146,12 @@ $.extend( window.jw, {
         option.over && jw.over();
 
         if(option.title!==false){
-        	   var _div="<div style='float:right'><a href='javascript:;'  style='text-decoration:none;outline:medium none;'";
-              header="<div class='jw-dialog-title'>"+
-                         "<div style='float:left;width:auto' class='jw-title'>"+(option.title||'')+"</div>";
-             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></div>");
-             option.max!=false && (header+=_div+" class='max'>□</a>&nbsp;&nbsp;</div>");
-             header+="<div style='clear:both'></div></div>";
+        	   var _div="<span><a href='javascript:;'  style='text-decoration:none;outline:none;'";
+              header="<div class='jw-dialog-title'><table style='width:100%'><tr><td>"+
+                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='30px'>";
+             option.max!=false && (header+=_div+" class='max'>□</a></span>&nbsp;&nbsp;");
+             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></span>");
+             header+="</td></tr></table></div>";
              header=$(header);
              hd.append(header);
          }
