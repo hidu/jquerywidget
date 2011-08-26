@@ -28,11 +28,10 @@ $.extend( window.jw, {
      var b=$(bar),t=target?$(target):b,x,y,moving=false,opacity,zi;
       
 	  t.css('position','absolute');
-	  opacity=t.css('opacity')||1.0;
-	  zi=t.css('z-index');
 	  var ifr=t.find('iframe'),over=null;
       b.mousedown(function(e){
-    	  console.log(e);
+    	  zi=t.css('z-index');
+    	  opacity=t.css('opacity')||1.0;
             x= e.clientX;
             y= e.clientY;
             moving=true;
@@ -183,7 +182,7 @@ $.extend( window.jw, {
         	  dialog.animate({top:top,left:left});
             }
            
-          var isMax=false,last={},lastHeight=0,lastMaxClickTime=0;
+          var isMax=false,last={},lastMaxClickTime=0;
           var close=function(){
           	     jw.over('close');
           	     typeof option.closeFn=='function'&& option.closeFn();
@@ -196,15 +195,12 @@ $.extend( window.jw, {
         		  }
         	   lastMaxClickTime=cTime;
         	   if(isMax){
-        		   dialog.animate(last);
-        		   setSize(last.width,lastHeight);
         		   isMax=false;
+        		   setBounds(last.top,last.left,last.width,last.height);
         	   }else{
         		   isMax=true;
-	        	   last={top:dialog.css('top'),left:dialog.css('left'),width:dialog.width()};
-	        	   lastHeight=body.height();
-	        	   dialog.animate({top:$(window).scrollTop()+1,left:1,width:ww});
-	        	   setSize(0,wh-55);
+	        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:body.height()};
+	        	   setBounds(1,$(window).scrollTop(),ww,wh-(dialog.height()-body.height())-5);
         	   }
         	   typeof option.maxFn=='function' && option.maxFn();
             };
