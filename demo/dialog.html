@@ -18,13 +18,12 @@ var url="http://abc.com:8080/dir/index.html?id=255&m=hello#top";
 //var url="/dir/index.html?id=255&m=hello#top";
 var p=jw.parseUrl(url);
 
-console.log(p);
 
 </script>
 <input type="button" onclick="jw.alert('这是一个alert!','5');" value="alert"><br/>
 <input type="button" onclick="jw.alert('这是一个alert1111111111111111111!','5');" value="alert"><br/>
 
-<input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800});" value="dialog idrame">
+<input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:600});" value="dialog idrame">
 
 <input type="button" onclick="jw.dialog({iframe:'iframe.html'});" value="dialog idrame2">
 <input type="button" onclick="jw.msg('你好'+Math.random());" value="jw.msg">

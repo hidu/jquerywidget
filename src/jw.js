@@ -118,18 +118,18 @@ $.extend( window.jw, {
 		     title:''
 		},option||{});
         var _id="jw-dialog-"+new Date().getTime(),header;
-        var dialog=$("<table id='"+_id+"' class='jw-dialog'>" +
+        var dialog=$("<table id='"+_id+"' class='jw-dialog'><tbody class='jw-dialog-tbody'>" +
         		"<tr><td><div class='jw-dialog-top-left'></div></td><td><div class='jw-dialog-top'></div></td><td><div class='jw-dialog-top-right'></div></td></tr>" +
         		"<tr><td rowspan='2'><div class='jw-dialog-left'></div></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'><div class='jw-dialog-right'></div></td></tr>" +
         		"<tr><td valign='top' id='"+_id+"_bd' class='jw-dialog-bd'></td></tr>" +
         		"<tr><td><div class='jw-dialog-bottom-left'></div></td><td><div class='jw-dialog-bottom'></div></td><td><div class='jw-dialog-bottom-right'></div></td></tr>" +
-        		"</table>");
-        dialog.prependTo(document.body).hide();
+        		"</tbody></table>");
+        dialog.appendTo(document.body).hide();
         var body=$('#'+_id+"_bd",dialog);
         var hd=$('#'+_id+"_hd",dialog);
         var ww=$(window).width(),wh=$(window).height();
        
-        dialog.css({left:(ww-380)/2});
+        dialog.css({left:(ww-option.width)/2,top:0.75*wh/2+$(window).scrollTop()});
         option.id && body.append($(option.id));
         option.over && jw.over();
 
@@ -147,31 +147,41 @@ $.extend( window.jw, {
         function setTitle(title){
         	 option.title!==false && header.find('.jw-title').text(title);
          }
+     	 var isSameDomain=!!option.id ||!!option.rel;
+     	 if(!isSameDomain){
+     		 var _ifr_url=jw.parseUrl(option.iframe);
+     		isSameDomain=(_ifr_url['protocol']+_ifr_url['host'])==(location.protocol+location.host);
+     		_ifr_url=null;
+     	 }
+        
         var setSize=function(width,height){
         	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
         	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
         	
-        	var h=Math.max(height,140,option.iframe?option.height:0),
-        	    w=Math.max(width,400,option.iframe?option.width:0);
-    		if(option.iframe){
-    			setTimeout(function(){
-    				body.find('.jw-dialog-ifr').animate({height:h},setPosition);
-    			},10);
-    		}else{
-    			body.animate({height:h,width:w});
-    		}
+        	autoBounds(width,height);
         };
-       
-         function setPosition(){
-        	 setTimeout(function(){
-	        	 var top=((Math.max(wh-dialog.height(),0))/2+$(window).scrollTop())*0.75,
-	        	     left=(ww-dialog.width())/2+$(window).scrollLeft();
-	                dialog.css({left:left,top:top}).animate({opacity:"show"});
-        	 },11);
-           };
-          function setBounds(top,left,width,height){
-        	   
+           
+          function autoBounds(_w,_h){
+        	   var h=Math.max(isSameDomain?(_h||dialog.height()):option.height,140);
+     		   var w=Math.max(isSameDomain?(_w||dialog.width()):option.width,140);
+	          var top=0.75*(wh-h)/2+$(window).scrollTop(),
+	        	    left=(ww-w)/2+$(window).scrollLeft();
+	             setBounds(top,left,w,h);
            }
+           
+          function setBounds(top,l,width,height){
+//        	  dialog.animate({opacity:'show',top:top,left:l,width:width},function(){dialog.width(width)});
+        	  dialog.css({opacity:0.1}).show().animate({opacity:1,top:top,left:l,width:width});
+        	  if(isSameDomain && !option.iframe){
+        		  body.css('height','auto');
+        	  }else{
+        		  body.animate({height:height});
+        	  }
+           }
+          
+          function setLocation(top,left){
+        	  dialog.animate({top:top,left:left});
+            }
            
           var isMax=false,last={},lastHeight=0,lastMaxClickTime=0;
           var close=function(){
@@ -187,7 +197,7 @@ $.extend( window.jw, {
         	   lastMaxClickTime=cTime;
         	   if(isMax){
         		   dialog.animate(last);
-        		   setSize(null,lastHeight);
+        		   setSize(last.width,lastHeight);
         		   isMax=false;
         	   }else{
         		   isMax=true;
@@ -199,52 +209,56 @@ $.extend( window.jw, {
         	   typeof option.maxFn=='function' && option.maxFn();
             };
          
-           
+         var ifr=null;
          if(option.rel){
-             body.empty().load(option.rel,setPosition);
+             body.empty().load(option.rel,autoBounds);
          }else if(option.iframe){
-         	var ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
-         	ifr.appendTo(body);
-         	var _ifr_url=jw.parseUrl(option.iframe);
-         	var _is_sameDomain=(_ifr_url['protocol']+_ifr_url['host'])==(location.protocol+location.host);
-         	_is_sameDomain && ifr.load(function(){
-         		 var c=null,newHeight=0,newWidth=0;
-         		  try{
-                       c=$(this).contents();
-                       if(!c)return;
-                       var ifrTitle=c.attr('title');
-                       if(ifrTitle.length)setTitle(ifrTitle);
-                     	  
-                       newHeight=$('body',c).height();
-                       newWidth=$('html',c).attr('scrollWidth')+10;
-                       var b1=b2=false;
-                       
-                       if(newHeight>wh){newHeight=wh-52;b1=true;};
-                       if(newWidth>ww){newWidth=ww-10;b2=true};
-                       setSize(newWidth+15,newHeight+30);
-                       (b1 && b2)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
-                      }catch(e){}
-                      
-                      c.find('.close').click(close).end().find('.max').click(max);
-                      setPosition();
-         		});
-          	dialog.show();
-         	 setPosition();
-             
+	         	ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
+	         	ifr.appendTo(body);
+	         	if(isSameDomain){
+	         		_iframe_load();
+	         	}else{
+	         		dialog.css({top:wh/2,left:ww/2,width:"1px"});
+	         		body.height(1);
+	        		autoBounds();
+	         	}
          }else{
-        	 setPosition();
+        	 autoBounds();
          }
-         
-        var fn=function(){setPosition();dialog.is(":visiable")&&jw.over();};
+         //iframe load 事件 处理
+         function _iframe_load(){
+        	body.height(1);
+        	dialog.css({opacity:0.1}).show();
+    		ifr.load(function(){
+         		 var c=$(this).contents(),h=0,w=0;
+               if(!c)return;
+               c.find('.close').click(close).end().find('.max').click(max);
+
+               var it=c.attr('title');
+               if(it.length)setTitle(it);
+             	  
+               h=$('body',c).height();
+               w=$('html',c).width();
+               
+               var b=0;
+               if(h>wh){h=wh-52;b++;};
+               if(w>ww){w=ww-10;b++;};
+               dialog.css({left:ww/2,top:wh/2,width:"1px"});
+               (b>1)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
+               setSize(w,h+20);
+               return true;
+         	});
+          }
+        var fn=function(){autoBounds();dialog.is(":visiable")&&jw.over();};
         $(window).resize(fn);
-        option.fixed && $(window).scroll(setPosition);
+        option.fixed && $(window).scroll(autoBounds);
         dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
         if(option.close!=false){
         	$(window).keydown(function(e){
         		e.keyCode==27 && close();
         	});
         }
-        !!!option.drag && jw.drag(header,dialog);
+        option.drag && jw.drag(header,dialog);
         return {close:close};
     }
     window.jw=window.jw||{};
