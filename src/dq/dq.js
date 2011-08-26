@@ -9,6 +9,7 @@
 * 20101231  ajax load 给内容添加close事件支持
 *20110407  loadHref判断链接是否存在
 *20110419    ajaxFile支持file标签 多文件选择
+*20110826 ajaxSubmit 添加表单注册延时参数 delay
 * @copyright duwei
 * @author duwei<duv123@gmail.com>
  */
@@ -18,7 +19,7 @@
        *版本号
        */
        toString:function(){
-           return "DuWei Ajax util 2011-08-25";
+           return "DuWei Ajax util 2011-08-26";
        },
        /**
        *在ajax load 数据的时候，使用该方法将目标显示正在装载的动画效果
@@ -74,6 +75,7 @@
      * @param ext  其他参数
      *@param ext.validate boolean 是否使用$.validate 插件进行表单验证
      *@param ext.reload  boolean  当使用ajax 表单查询的时候，是否在现实位置添加[刷新列表]的 链接（ajax刷新当前页）
+     *@param ext.delay  int  注册函数是否延时
      *@param ext.validateRule object $.Validate 的验证规则
      *@param ext.beforeFn function  发送请求前的自定义回调函数 返回 false 将终止动作
      */
@@ -82,8 +84,13 @@
 	        	ext=sucFn;
 	        	sucFn=targetID;
 	        	targetID=null;
-	       } 	
-        ext=ext||{reload:false};
+	       }
+        if(!$.isFunction(sucFn)){
+        	ext=sucFn;
+        	sucFn='';
+           }
+        
+        ext=ext||{reload:false,delay:0};
          
         var that=this,
             form=$(formID),
@@ -152,37 +159,45 @@
   				},
                 error:errorFn
          };
-         //使用 $.validator 进行表单验证
-         if(ext.validate !== false && $.validator){
-             var validateOpt={submitHandler: function() {form.ajaxSubmit(options);}};
-             ext.validateOpt  && $.extend(validateOpt, ext.validateOpt);
-             ext.validateRule && $.extend(validateOpt,{rules:ext.validateRule});
-             if(ext.errorToTip){
-                   /**
-                 *jquery.validate 验证后错误信息显示位置设置函数，
-                    *在ajaxSubmit 中若该默认的不能满足需求可以用户自定义
-                    */
-                   var   validateErrorPlace=function(error, element){
-                         var nextTip=element.next('span.tip');
-                         var tip=element.parents("td").find('span.tip');
-                         var tipsize=tip.size();
-                         if(nextTip.size()){
-                             error.appendTo(nextTip);
-                         }else if(tipsize){
-                                  error.appendTo(tip.eq(tipsize-1));
-                          }else{
-                                 error.insertAfter(element);
-                          }
-                     };//end validateErrorPlace
-                 var fn= (ext.validateErrorPlace && $.isFunction(ext.validateErrorPlace))?ext.validateErrorPlace:validateErrorPlace;
-                 $.extend(validateOpt,{errorPlacement: fn});
-              }
-             form.validate(validateOpt);
+         function _reg_form(){
+	         if(ext.validate !== false && $.validator){ //使用 $.validator 进行表单验证
+	             var validateOpt={submitHandler: function() {form.ajaxSubmit(options);}};
+	             ext.validateOpt  && $.extend(validateOpt, ext.validateOpt);
+	             ext.validateRule && $.extend(validateOpt,{rules:ext.validateRule});
+	             if(ext.errorToTip){
+	                   /**
+	                 *jquery.validate 验证后错误信息显示位置设置函数，
+	                    *在ajaxSubmit 中若该默认的不能满足需求可以用户自定义
+	                    */
+	                   var   validateErrorPlace=function(error, element){
+	                         var nextTip=element.next('span.tip');
+	                         var tip=element.parents("td").find('span.tip');
+	                         var tipsize=tip.size();
+	                         if(nextTip.size()){
+	                             error.appendTo(nextTip);
+	                         }else if(tipsize){
+	                                  error.appendTo(tip.eq(tipsize-1));
+	                          }else{
+	                                 error.insertAfter(element);
+	                          }
+	                     };//end validateErrorPlace
+	                 var fn= (ext.validateErrorPlace && $.isFunction(ext.validateErrorPlace))?ext.validateErrorPlace:validateErrorPlace;
+	                 $.extend(validateOpt,{errorPlacement: fn});
+	              }
+	               form.validate(validateOpt);
+	         }else{
+	             form.submit(function(){
+	                    $(this).ajaxSubmit(options);
+	                    return false;
+	                });
+	         }
+         }
+         if(ext.delay){
+	         $().ready(function(){
+	        	setTimeout( _reg_form,ext.delay);
+	         });
          }else{
-             form.submit(function(){
-                    $(this).ajaxSubmit(options);
-                    return false;
-            });
+        	 _reg_form();
          }
          return form;
     },
