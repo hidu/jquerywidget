@@ -1,6 +1,27 @@
 window.jw=window.jw||{};
 
-$.extend( window.jw, {version: "1.0"});
+$.extend( window.jw, {
+	version: "1.0",
+	parseUrl:function(url){
+	var a=/^([A-Za-z]+):(\/{0,3})/;
+	if(!a.test(url)){
+		url=location.protocol+"//"+location.host+"/"+url;
+	}
+	 var reg=/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
+	 var reg_result=reg.exec(url);
+	 var names=['href','protocol','slash','hostname','port','pathname','query','hash'];
+	 var result={};
+	 var i;
+	 for(i=0;i<names.length;i++){
+		 result[names[i]]=reg_result[i];
+	 }
+	 result['port']=result['port']||80;
+	 result['protocol']=(result['protocol']||"http")+":";
+	 result['host']=(result['protocol']+result['port'])=="http:80"?result['hostname']:(result['hostname']+":"+result['port']);
+	 result['hash']=(result['hash']+"").length?"#"+result['hash']:"";
+	 return result;
+    }
+});
 
 /**
  * @author duwei<duv123@gmail.com>
@@ -189,7 +210,10 @@ $.extend( window.jw, {version: "1.0"});
              body.empty().load(option.rel,setPosition);
          }else if(option.iframe){
          	var ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0></iframe>");
-         	ifr.appendTo(body).load(function(){
+         	ifr.appendTo(body);
+         	var _ifr_url=jw.parseUrl(option.iframe);
+         	var _is_sameDomain=(_ifr_url['protocol']+_ifr_url['host'])==(location.protocol+location.hostname+(location.port));
+         	_is_sameDomain && ifr.load(function(){
          		 var c=null,newHeight=0,newWidth=0;
          		  try{
                        c=$(this).contents();
