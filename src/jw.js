@@ -89,7 +89,6 @@ $.extend( window.jw, {
 		if(opt=='show'){
 			if($('.jw-over').length)return;
 			over=$('<div class="jw-over" ></div>');
-//			over.html('<style>.jw-over-hidden{width:100%;overflow: hidden;height:'+wh+'px}</style>');
 			$().ready(function(){
 				$(document.body).append(over).addClass('jw-over-hidden');
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
@@ -223,7 +222,7 @@ $.extend( window.jw, {
         	   }else{
         		   isMax=true;
 	        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:body.height()};
-	        	   setBounds(1,$(window).scrollTop(),ww,wh-(dialog.height()-body.height()));
+	        	   setBounds($(window).scrollTop(),1,ww,wh-(dialog.height()-body.height()));
         	   }
         	   var _max=header.find('.max');
         	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
