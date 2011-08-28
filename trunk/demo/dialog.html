@@ -22,7 +22,9 @@ jw.msg("还可以");
 //var url="http://abc.com:8080/dir/index.html?id=255&m=hello#top";
 var url="dir/index.html?id=255&m=hello#top";
 //var p=jw.parseUrl(url);
-
+$().ready(function(){
+  jw.drag("#c");
+});
 </script>
 <input type="button" onclick="jw.alert('这是一个alert!','5');" value="alert"><br/>
 <input type="button" onclick="jw.alert('这是一个alert1111111111111111111!','5');" value="alert"><br/>
@@ -33,7 +35,7 @@ var url="dir/index.html?id=255&m=hello#top";
 <input type="button" onclick="jw.msg('你好'+Math.random());" value="jw.msg">
 <br/>adassasa
 <a onclick="jw.dialog({rel:'_load.html'});return false;">test</a>
-
+<div id="c" style='border:1px solid blue;'>hellohello</div>
 <p>asdasd</p>
 <p>asdasd</p>
 <p>asdasd</p>
