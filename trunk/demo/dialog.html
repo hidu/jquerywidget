@@ -58,7 +58,16 @@ $().ready(function(){
 <p>asdasd</p>
 <p>asdasd</p>
 <p>asdasd</p>
-<p>asdasd</p>
+<p><a href="http://qd.pujia.com" class='jw-tip'>asdasd</a></p>
 <input type="button" onclick="jw.dialog({iframe:'http://127.0.0.1/rare/'});" value="dialog idrame">
+<div id="fixed01" style="position:fixed;top:100px;right:50px;width:50px;height:200px;border:1px solid red">
+你好阿
+</div>
+<script>
+jw.position_fixed("#fixed01");
+$('.jw-tip').each(function(){
+	jw.tip(this);
+});
+</script>
 </body>
 </html>
