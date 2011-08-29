@@ -2,6 +2,7 @@ window.jw=window.jw||{};
 
 $.extend( window.jw, {
 	version: "1.0",
+	//url 地址解析
 	parseUrl:function(url){
 		 //若是ie浏览器，相对地址 如 jquery/widget.html 并不能正常识别
 		 if($.browser.msie){
@@ -25,7 +26,58 @@ $.extend( window.jw, {
 		 result['query']=result['search'].replace(/^\?/,'');
 		 a=null;
 		 return result;
-    }
+    },
+    //tab 选项卡
+    tab:function(headItems, contentItems,fn) {
+		var C = $(headItems), B = $(contentItems);
+		C.click(function(e) {
+			var i = C.index(this);
+			C.removeClass("cur");
+			$(this).addClass("cur");
+			if(fn && $.isFunction(fn)){
+				if(fn(i,this,e)===false)return false;
+			}
+			B.hide().eq(i).show();
+		});
+		if(C.filter('.cur').size()<1)C.eq(0).addClass("cur");
+		C.filter('.cur').trigger('click');
+	},
+	//笼罩层
+	over:function(opt){
+		opt=opt||'show';
+		var over,wh=$(window).height(),bh=$('body').outerHeight();
+		if(opt=='show'){
+			if($('.jw-over').length)return;
+			over=$('<div class="jw-over" ></div>');
+			$().ready(function(){
+				$(document.body).append(over).addClass('jw-over-hidden');
+				(typeof $.fn.bgiframe=='function') && over.bgiframe();
+				over.height(bh+wh);
+			});
+		}else{
+			$(document.body).removeClass('jw-over-hidden');
+			setTimeout(function(){$('.jw-over').remove();},1);
+		}
+	},
+	//使ie6 支持 position fixed
+	position_fixed:function(target){
+		target=$(target);
+		var ie6=$.browser.msie && $.browser.version<=6; 
+		if(!ie6)return true;
+		target.css({position:'absolute'});
+		var bottom=parseInt(target.css('bottom'));
+		var top=parseInt(target.css('top'));
+		function listen(){
+			if(bottom){
+    			target.css('top',($(window).height()+$(window).scrollTop()-bottom-40)).show();
+			}else{
+    			target.css('top',($(window).scrollTop()+top)).show();
+			}
+		}
+		$(window).scroll(listen).resize(listen);
+		listen();
+	}
+	
 });
 
 /**
@@ -81,26 +133,6 @@ $.extend( window.jw, {
     $.extend(jw,{drag:drag});
 })(jQuery);
 
-
-(function($){
-	function over(opt){
-		opt=opt||'show';
-		var over,wh=$(window).height(),bh=$('body').outerHeight();
-		if(opt=='show'){
-			if($('.jw-over').length)return;
-			over=$('<div class="jw-over" ></div>');
-			$().ready(function(){
-				$(document.body).append(over).addClass('jw-over-hidden');
-				(typeof $.fn.bgiframe=='function') && over.bgiframe();
-				over.height(bh+wh);
-			});
-		}else{
-			$(document.body).removeClass('jw-over-hidden');
-			setTimeout(function(){$('.jw-over').remove();},1);
-		}
-	}
-	 $.extend(jw,{over:over});
-})(jQuery);
 
 ;(function($){	
 /**
@@ -265,7 +297,8 @@ $.extend( window.jw, {
          		 var c=$(this).contents(),h=0,w=0;
                if(!c)return;
                c.find('.close').click(close).end().find('.max').click(max);
-
+               $('body',c).bind('close',close);
+                 
                var it=c.attr('title');
                if(it.length)setTitle(it);
                dialog.width(300);
@@ -291,7 +324,7 @@ $.extend( window.jw, {
         	});
         }
         option.drag && jw.drag(header,dialog);
-        return {close:close};
+        return {close:close,setSize:setSize,setBounds:setBounds,setLocation:setLocation,setTitle:setTitle};
     }
     window.jw=window.jw||{};
     $.extend(jw,{dialog:dialog}); 
@@ -336,96 +369,8 @@ $.extend( window.jw, {
     $.extend(jw,{alert:jwalert}); 
 })(jQuery);
 
-;(function($){
-	var tip=function(id,opt){
-	  opt=opt||{};
-		var t=$(id);
-		var rel=t.attr('href');
-		
-		var tipDiv=null,ifr=null;
-		var ww=$(window).width(), hh=$(window).height();
-		var w=opt.width||300,h=opt.height||200,x=y=0;
-		var tipid="jw-tip-div"+parseInt(Math.random()*100000);
-		
-		var isFirst=true;
-		function getTipDiv(){
-		    tipDiv=$("#"+tipid);
-    		if(!tipDiv.length){
-     			tipDiv=$("<div style='position:absolute;border:1px solid' id='"+tipid+"'></div>");
-     			ifr=$("<iframe src='"+rel+"' style='width:100%;height:100%;border:0'></iframe>");
-     			ifr.appendTo(tipDiv);
-    			$('body').append(tipDiv);
-    		}else{
-		          isFirst=false;
-    		}
-    		tipDiv.show();
-		}
-		var isOver=false;
-		
-		function getX(w){
-		  var _x=x+w>ww?x-w-25:x;
-		  return _x<0?5:_x;
-		}
-		function getY(h){
-			var _y= y+h>hh?y-h-45:y;
-			return _y<0?5:_y;
-		}
-		t.mouseover(function(e){
-		  if(isOver)return;
-		  getTipDiv();
-		  if(isFirst){
-			  var offset = t.offset();
-				x=offset.left+30,y=offset.top+30;	
-				tipDiv.css({top:y});
-	  			ifr.load(function(){
-				   try{
-	      				var c=$(this).contents();
-	      				 w=$('html',c).attr('scrollWidth')+20;
-	      				 h=$('html',c).height();
-	          		     x=getX(w);
-	          		     y=getY(h);
-	      				 tipDiv.width(w).height(h);
-	      				 tipDiv.css('left',x).css('top',y);
-	    			}catch(e1){
-	        		     x=getX(w);
-	    				 tipDiv.width(w).height(h);
-	    				 tipDiv.css('left',x);
-	    			}
-	  			});
-			  }
-			isOver=true;
-		}).mouseout(function(){
-			 tipDiv && tipDiv.hide();
-			 isOver=false;
-		});
-		
-	};
-	 window.jw=window.jw||{};
-	 $.extend(jw,{tip:tip}); 
-})(jQuery);
 
-;(function(){
-	//使ie6 支持 position fixed
-	function position_fixed(target){
-		target=$(target);
-		var ie6=$.browser.msie && $.browser.version<=6; 
-		if(!ie6)return true;
-		target.css({position:'absolute'});
-		var bottom=parseInt(target.css('bottom'));
-		var top=parseInt(target.css('top'));
-		function listen(){
-			if(bottom){
-    			target.css('top',($(window).height()+$(window).scrollTop()-bottom-40)).show();
-			}else{
-    			target.css('top',($(window).scrollTop()+top)).show();
-			}
-		}
-		$(window).scroll(listen).resize(listen);
-		listen();
-	}
-	$.extend(jw,{position_fixed:position_fixed}); 
-})(jQuery);
-
+//网页底部的提示信息
 ;(function(){
 	function msg(message,time,callFn){
 		function createUI(){
