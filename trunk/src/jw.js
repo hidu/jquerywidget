@@ -1,6 +1,6 @@
-window.jw=window.jw||{};
 
 (function(){
+	window.jw=window.jw||{};
 	if(window.jw.version)return;
 	
 	window.jw={
