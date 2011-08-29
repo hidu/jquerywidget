@@ -56,12 +56,13 @@
 			if($('.jw-over').length)return;
 			over=$('<div class="jw-over" ></div>');
 			$().ready(function(){
-				$(document.body).append(over).addClass('jw-over-hidden');
+				$(document.body).append(over);
+				$('html').addClass('jw-over-hidden');
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
 				over.height(bh+wh);
 			});
 		}else{
-			$(document.body).removeClass('jw-over-hidden');
+			$('html').removeClass('jw-over-hidden');
 			setTimeout(function(){$('.jw-over').remove();},1);
 		}
 	},
