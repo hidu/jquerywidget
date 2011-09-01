@@ -266,7 +266,11 @@
          if(!target.size())return false;
         pager.find("a").click(function(){
         	try{
-        		 window.scrollTo(0,target.offset().top-20);
+        		var y=target.offset().top;
+        		var h=$(window).height();
+        		if(y>window.scrollY+0.75*h || y<window.scrollY){
+        			window.scrollTo(0,y-20);
+        		}
               that.ajaxLoading(target);
               var rel=$(this).attr('href');
               target.attr('rel',rel).load(rel);
