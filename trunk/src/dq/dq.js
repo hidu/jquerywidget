@@ -222,7 +222,7 @@
         $(selector).click(function(){
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
-             window.scrollTo(0,target.offset().top-20);
+             window.scrollTo(window.scrollX,target.offset().top-20);
              that.ajaxLoading(targetID);
              target.attr('rel',rel).load(rel).unbind('reload').bind('reload',function(e){
                   that.ajaxLoading(targetID);
@@ -269,7 +269,7 @@
         		var y=target.offset().top;
         		var h=$(window).height();
         		if(y>window.scrollY+0.75*h || y<window.scrollY){
-        			window.scrollTo(0,y-20);
+        			window.scrollTo(window.scrollX,y-20);
         		}
               that.ajaxLoading(target);
               var rel=$(this).attr('href');
