@@ -11,6 +11,7 @@
 *20110419    ajaxFile支持file标签 多文件选择
 *20110826 ajaxSubmit 添加表单注册延时参数 delay
 *20110829  移除dialog
+*20110901  loadPager 聚焦到目标
 * @copyright duwei
 * @author duwei<duv123@gmail.com>
  */
@@ -217,12 +218,13 @@
      * @param targetID  显示目标ID
      */
     loadHref:function(selector,targetID,relAttrName){
-         var that=this;
+         var that=this,target=$(targetID);
         $(selector).click(function(){
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
+             window.scrollTo(0,target.offset().top-20);
              that.ajaxLoading(targetID);
-            $(targetID).attr('rel',rel).load(rel).unbind('reload').bind('reload',function(e){
+             target.attr('rel',rel).load(rel).unbind('reload').bind('reload',function(e){
                   that.ajaxLoading(targetID);
                   $(this).load($(this).attr('rel'));
                   return false;
@@ -264,6 +266,7 @@
          if(!target.size())return false;
         pager.find("a").click(function(){
         	try{
+        		 window.scrollTo(0,target.offset().top-20);
               that.ajaxLoading(target);
               var rel=$(this).attr('href');
               target.attr('rel',rel).load(rel);
