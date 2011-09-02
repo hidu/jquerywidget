@@ -222,7 +222,7 @@
         $(selector).click(function(){
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
-             window.scrollTo(window.scrollX,target.offset().top-20);
+             that.centerIt(target);
              that.ajaxLoading(targetID);
              target.attr('rel',rel).load(rel).unbind('reload').bind('reload',function(e){
                   that.ajaxLoading(targetID);
@@ -266,11 +266,7 @@
          if(!target.size())return false;
         pager.find("a").click(function(){
         	try{
-        		var y=target.offset().top;
-        		var h=$(window).height();
-        		if(y>window.scrollY+0.75*h || y<window.scrollY){
-        			window.scrollTo(window.scrollX,y-20);
-        		}
+        		that.centerIt(target);
               that.ajaxLoading(target);
               var rel=$(this).attr('href');
               target.attr('rel',rel).load(rel);
@@ -285,6 +281,16 @@
              $(this).load($(this).attr('rel'));
         });
                
+    },
+    /**
+     * 将指定控件至于屏幕中间
+     */
+    centerIt:function(target){
+    	var y=$(target).offset().top;
+		var h=$(window).height();
+		if(y>window.scrollY+0.75*h || y<window.scrollY){
+			window.scrollTo(window.scrollX,y-20);
+		}
     },
 
    /**
