@@ -20,7 +20,7 @@
   if(window.dq.version)return;
   
   window.dq={
-		 version:'20110829',
+		 version:'20110902',
       /**
        *版本号
        */
