@@ -127,17 +127,18 @@
             	  if(false===ext.beforeFn(jqForm)){
                    return false;
             	  }
-            }
+              }
             submitEnable(false);
             var qstring = $.param(formData);
-            if(targetID && ext.reload){
+            if(targetID){
                  that.ajaxLoading(targetID);
-                var target=$(targetID);
-                target.attr('rel',options.url+'?'+qstring).unbind('reload').bind('reload',function(){
-                      $this.ajaxLoading(targetID);
-                      $(this).load($(this).attr('rel'));
-                      return;
-                  });
+                 if(ext.reload){
+		               $(targetID).attr('rel',options.url+'?'+qstring).unbind('reload').bind('reload',function(){
+		                      that.ajaxLoading(targetID);
+		                      $(this).load($(this).attr('rel'));
+		                      return;
+		                  });
+                 }
             }
             
         };//end showRequest
