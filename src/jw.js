@@ -168,15 +168,20 @@
 	        		"<tr class='jw-dialog-bottom-tr'><td><div class='jw-dialog-bottom-left'></div></td><td><div class='jw-dialog-bottom'></div></td><td><div class='jw-dialog-bottom-right'></div></td></tr>" +
 	        		"</table>");
 	        dialog.appendTo(document.body).hide();
+	        option.over && this.over();
 	        var body=$('#'+_id+"_bd",dialog);
 	        var hd=$('#'+_id+"_hd",dialog);
 	        var ww=$(window).width(),wh=$(window).height();
 	        var isMax=false;
 	        var that=this;
-	       
+	        $(window).resize(function(){
+	        	 ww=$(window).width();
+	        	 wh=$(window).height();
+	         });
+	        
 	        dialog.css({left:(ww-option.width)/2,top:0.75*wh/2+$(window).scrollTop(),width:380,height:140});
 	        option.id && body.append($(option.id));
-	        option.over && this.over();
+	       
 
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
@@ -214,7 +219,7 @@
 	           
 	          function setBounds(top,l,width,height){
 	        	  width=Math.min(width,ww);
-	        	  height=Math.min(height,wh-60);
+	        	  height=Math.min(height,wh);
 	        	  dialog.css({opacity:0.1}).show().animate({opacity:1,top:top,left:l,width:width});
 	        	  if(isSameDomain && !option.iframe && !isMax){
 	        		  body.css('height','auto');
@@ -301,14 +306,14 @@
 	               if(it.length)setTitle(it);
 	               dialog.width(300);
 	               body.height(100);
-	               h=c.height()+10;
-	               w=c.width()+20;
+	               h=Math.max(c.height()+10,op.height||0);
+	               w=Math.max(c.width()+20,op.width||0);
 	               var b=0;
 	               if(h>wh){h=wh-52;b++;};
 	               if(w>ww){w=ww-10;b++;};
-	               dialog.css({left:ww/2,top:wh/2,width:"1px"});
-	               setSize(w,h);
-	               (b>1)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
+	            	   dialog.css({left:ww/2,top:wh/2,width:"1px"});
+	            	   setSize(w,h);
+	            	   (b>1)? ifr.attr('scrolling','no'):ifr.removeAttr('scrolling');
 	               return true;
 	         	});
 	          }
