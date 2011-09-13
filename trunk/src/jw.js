@@ -153,49 +153,52 @@
 	  dialog:function(option){
 	    	var op=option||{};
 	    	option=$.extend({},{
-		   	     width:400,
-			     height:80,
+		   	     width:300,
+			     height:100,
 			     close:true,
 			     drag:true,
 			     over:true,
-			     title:''
+			     title:'',
+			     iframeScroll:true,
+			     iframeFetchTitle:true,
+			     zIndex:301,
+			     target:window
 			},op);
+	    	var win=option.target;
+	    	var ww=$(win).width(),wh=$(win).height();
 	        var _id="jw-dialog-"+new Date().getTime(),header;
-	        var dialog=$("<table id='"+_id+"' class='jw-dialog'>" +
-	        		"<tr class='jw-dialog-top-tr'><td><div class='jw-dialog-top-left'></div></td><td><div class='jw-dialog-top'></div></td><td><div class='jw-dialog-top-right'></div></td></tr>" +
-	        		"<tr><td rowspan='2'><div class='jw-dialog-left'></div></td><td id='"+_id+"_hd' valign='top' class='jw-dialog-header'></td><td rowspan='2'><div class='jw-dialog-right'></div></td></tr>" +
-	        		"<tr><td valign='top' id='"+_id+"_bd' class='jw-dialog-bd'></td></tr>" +
-	        		"<tr class='jw-dialog-bottom-tr'><td><div class='jw-dialog-bottom-left'></div></td><td><div class='jw-dialog-bottom'></div></td><td><div class='jw-dialog-bottom-right'></div></td></tr>" +
-	        		"</table>");
-	        dialog.appendTo(document.body).hide();
+	        var _style="top:"+(0.75*(wh-option.height)/2+$(win).scrollTop())+"px;left:"+((ww-option.width)/2+$(win).scrollLeft())+"px;width:"+option.width+"px;height:"+option.height+"px";
+	        var dialog="<div class='jw-dialog' id='"+_id+"' style='"+_style+"'><div class='jw-dialog-hd'></div><div class='jw-dialog-bd'></div></div>";
+	        _style=null;
+	        dialog=$(win.document.body).append(dialog).find("#"+_id);
 	        option.over && this.over();
-	        var body=$('#'+_id+"_bd",dialog);
-	        var hd=$('#'+_id+"_hd",dialog);
-	        var ww=$(window).width(),wh=$(window).height();
+	        var bd=$('.jw-dialog-bd',dialog);
+	        var hd=$('.jw-dialog-hd',dialog);
 	        var isMax=false;
 	        var that=this;
-	        $(window).resize(function(){
-	        	 ww=$(window).width();
-	        	 wh=$(window).height();
+	        $(win).resize(function(){
+	        	 ww=$(win).width();
+	        	 wh=$(win).height();
 	         });
-	        
-	        dialog.css({left:(ww-option.width)/2,top:0.75*wh/2+$(window).scrollTop(),width:380,height:140});
+	        setTimeout(function(){
+//		        toCenter();
+		        dialog.css('z-index',option.zIndex);
+     	       setSize(option.width,option.height);
+	         },0);
 	        if(option.id){
-	        	var _div=$(option.id);
-	        	body.append(_div);
-	        	toCenter(300,200);
-	        }  
+    	        	bd.append(option.id);
+	         }
+	        var th=26;//hd的高度
+//	        var th=dialog.height()-bd.height();//hd的高度
 	       
-
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
-	              header="<div class='jw-dialog-title'><table style='width:100%'><tr><td>"+
+	              header="<table style='width:100%'><tr><td>"+
 	                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='55px' style='text-align:right'><nobr>";
 	             option.max!=false && (header+=_div+" class='max'>□</a></span>");
 	             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></span>");
-	             header+="</nobr></td></tr></table></div>";
-	             header=$(header);
-	             hd.append(header);
+	             header+="</nobr></td></tr></table>";
+	             header=hd.append(header).find('table');
 	         }
 	        function setTitle(title){
 	        	 option.title!==false && header.find('.jw-title').text(title);
@@ -209,26 +212,27 @@
 	        function setSize(width,height){
 	        	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
 	        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
-	        	
 	        	autoBounds(width,height);
 	        };
 	           
 	          function autoBounds(_w,_h){
 	        	   var h=Math.min(Math.max(isSameDomain?(_h||dialog.height()):option.height,140),wh-5);
-	     		   var w=Math.min(Math.max(isSameDomain?(_w||dialog.width()):option.width,140),ww);
-		          var top=0.75*(wh-h)/2+$(window).scrollTop(),
-		        	    left=(ww-w)/2+$(window).scrollLeft();
+	     		   var w=Math.min(Math.max(isSameDomain?(_w||dialog.width()):option.width,300),ww);
+		          var top=0.75*(wh-h)/2+$(win).scrollTop(),
+		        	    left=(ww-w)/2+$(win).scrollLeft();
 		             setBounds(top,left,w,h);
 	           }
 	           
 	          function setBounds(top,l,width,height){
 	        	  width=Math.min(width,ww);
 	        	  height=Math.min(height,wh);
-	        	  dialog.css({opacity:0.1}).show().animate({opacity:1,top:top,left:l,width:width});
+//	        	  try{
+	        	  dialog.animate({top:top,left:l,width:width,height:height+th});
+//	        	  }catch(e){alert(e.message)}
 	        	  if(isSameDomain && !option.iframe && !isMax){
-	        		  body.css('height','auto');
+	        		  bd.css('height','auto');
 	        	  }else{
-	        		  body.animate({height:height});
+	        		  bd.animate({height:height});
 	        	  }
 	           }
 	          
@@ -243,9 +247,9 @@
 	          	     if( $.isFunction(option.closeFn) && false===option.closeFn()){
 	          	    	 return false; 
 	          	      };
-	          	     body.empty().animate({height:0});
-	          	     dialog.animate({top:wh/2,left:ww/2,width:0,height:0});
-	               setTimeout(function(){dialog.remove();},250);;
+	          	     dialog.animate({top:wh/2,left:ww/2,width:0,height:0},function(){
+	          	    	dialog.remove();
+	          	     });
 	           }
 	         
 	           function max(e){
@@ -260,8 +264,8 @@
 	        		   setBounds(last.top,last.left,last.width,last.height);
 	        	   }else{
 	        		   isMax=true;
-		        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:body.height()};
-		        	   setBounds($(window).scrollTop(),1,ww,wh-(dialog.height()-body.height()));
+		        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:bd.height()};
+		        	   setBounds($(win).scrollTop(),1,ww,wh-(dialog.height()-bd.height()));
 	        	   }
 	        	   var _max=header.find('.max');
 	        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
@@ -271,26 +275,23 @@
 	         function toCenter(w,h){
 	        	 w=w||1;
 	        	 h=h||1;
-	        	 dialog.css({top:0.75*(wh-h)/2,left:(ww-w)/2,width:w+"px"});
-	      	     body.height(h);
+	        	 dialog.css({top:0.75*(wh-h)/2,left:(ww-w)/2,width:w,height:h+th});
+	      	     bd.height(h);
 	          }
 	         var ifr;
 	         
 	         if(option.rel){
-	             body.empty().load(option.rel,function(){
-	            	 dialog.css({opacity:0.1}).show();
-	            	 var _h=Math.max(body.height(),op.height||0);
+	             bd.empty().load(option.rel,function(){
+	            	 var _h=Math.max(bd.height(),op.height||0);
 	            	 var _w=Math.max(dialog.width(),op.width||0);
-	            	 toCenter(_w,_h);
 	            	 autoBounds(_w,_h);
 	            	});
 	         }else if(option.iframe){
-		         	ifr=$("<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>");
-		         	ifr.appendTo(body);
+		         	ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
+		         	ifr=bd.append(ifr).find('.iframe');
 		         	if(isSameDomain){
 		         		_iframe_load();
 		         	}else{
-		         		toCenter();
 		        		autoBounds();
 		         	}
 	         }else{
@@ -298,36 +299,34 @@
 	         }
 	         //iframe load 事件 处理
 	         function _iframe_load(){
-	        	body.height(1);
-	        	dialog.css({opacity:0.1}).show();
 	    		ifr.load(function(){
 	         		 var c=$(this).contents(),h=0,w=0;
 	               if(!c)return;
-	                 if(c.length>1){
+	               if($('body',c).html().length>0){
 		               c.find('.close').click(close).end().find('.max').click(max);
 		               $('body',c).bind('close',close);
-		               var it=c.attr('title');
-		               if(it.length)setTitle(it);
+		               if(option.iframeFetchTitle){
+			               var it=c.attr('title');
+			               if(it.length)setTitle(it);
+			               }
 		               dialog.width(300);
-		               body.height(100);
-		               h=Math.max(c.height()+10,op.height||0);
+		               bd.height(100);
+		               h=Math.max(c.height(),op.height||0);
 		               w=Math.max(c.width()+20,op.width||0);
-		               var b=0;
-		               if(h>wh){h=wh-52;};
-		               if(w>ww){w=ww-10;};
-		            	   dialog.css({left:ww/2,top:wh/2,width:"1px"});
-		            	   setSize(w,h);
-	                 }else{
+		               setTimeout(function(){
+    		            	 setSize(w,h);
+		                 },5);//use timeout to fix ie
+	               }else{
 	                	 setSize(option.width,option.height);
 	                 }
 	         	});
 	          }
 	        var fn=function(){autoBounds();dialog.is(":visiable")&&that.over();};
-	        $(window).resize(fn);
-	        option.fixed && $(window).scroll(autoBounds);
+	        $(win).resize(fn);
+	        option.fixed && $(win).scroll(autoBounds);
 	        dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
 	        if(option.close!=false){
-	        	$(window).keydown(function(e){
+	        	$(win).keydown(function(e){
 	        		e.keyCode==27 && close();
 	        	});
 	        }
