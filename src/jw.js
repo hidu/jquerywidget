@@ -68,21 +68,25 @@
 	},
 	
 	//使ie6 支持 position fixed
-	position_fixed:function(target){
+	position_fixed:function(target,win){
 		target=$(target);
+		win=win||window;
 		var ie6=$.browser.msie && $.browser.version<=6; 
-		if(!ie6)return true;
+		if(!ie6){
+			target.css({position:'fixed'});
+    		return true;
+		}
 		target.css({position:'absolute'});
 		var bottom=parseInt(target.css('bottom'));
 		var top=parseInt(target.css('top'));
 		function listen(){
 			if(bottom){
-    			target.css('top',($(window).height()+$(window).scrollTop()-bottom-40)).show();
+    			target.css('top',($(win).height()+$(win).scrollTop()-bottom-40)).show();
 			}else{
-    			target.css('top',($(window).scrollTop()+top)).show();
+    			target.css('top',($(win).scrollTop()+top)).show();
 			}
 		}
-		$(window).scroll(listen).resize(listen);
+		$(win).scroll(listen).resize(listen);
 		listen();
 	},
 	
@@ -158,6 +162,7 @@
 			     close:true,
 			     drag:true,
 			     over:true,
+			     fixed:true,
 			     title:'',
 			     iframeScroll:true,
 			     iframeFetchTitle:true,
@@ -305,7 +310,7 @@
 	       
 	        var fn=function(){autoBounds();dialog.is(":visiable")&&that.over();};
 	        $(win).resize(fn);
-	        option.fixed && $(win).scroll(autoBounds);
+	        option.fixed && setTimeout(function(){that.position_fixed(dialog,win);},1000);
 	        dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
 	        if(option.close!==false){
 	        	$(win).keydown(function(e){
