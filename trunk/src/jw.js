@@ -220,7 +220,7 @@
 	        };
 	           
 	          function autoBounds(_w,_h){
-	        	   var h=Math.min(Math.max(_h,bd.height(),option.height,140),wh-5);
+	        	   var h=Math.min(Math.max(_h,bd.height(),option.height,140),wh-5-th);
 	     		   var w=Math.min(Math.max(_w,dialog.width(),option.width,300,bd.width()),ww);
 		          var top=0.75*(wh-h)/2+$(win).scrollTop(),
 		        	    left=(ww-w)/2+$(win).scrollLeft();
@@ -300,9 +300,9 @@
 					               if(it.length)setTitle(it);
 					              }
 				               setTimeout(function(){
-				            	    dialog.width(300);
-					               bd.height(100);
-				            	   setSize(c.width(),c.height());},5);//use timeout to fix ie
+				            	    dialog.width(Math.max(300,dialog.width));
+					               bd.height(Math.max(100,bd.width()));
+				            	    setSize(c.width(),c.height());},5);//use timeout to fix ie
 			               }else{
 			                	 setSize(option.width,option.height);
 			                 }
@@ -388,7 +388,7 @@
 	    	code+="</center></div>";
     	var div=$(code);
     	var ja=null;
-    	div.appendTo(document.body);
+//    	div.appendTo(document.body);
     	var call_bk=function(fn){
     		if(ext){
     			var rt=(typeof fn=='function'?fn:(typeof ext=='function'?ext:function(){}))();
@@ -396,8 +396,8 @@
     		} 
     		ja.close();
     	};
-    	$('#'+id+"_ok").click(function(){call_bk(ext.okFn);});
-    	$('#'+id+"_cannel").click(function(){call_bk(ext.cannel);});
+    	$('#'+id+"_ok",div).click(function(){call_bk(ext.okFn);});
+    	$('#'+id+"_cannel",div).click(function(){call_bk(ext.cannel);});
     	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false});
       };
     $.extend(jw,{alert:jwalert}); 
