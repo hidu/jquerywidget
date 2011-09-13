@@ -167,7 +167,7 @@
 	    	var win=option.target;
 	    	var ww=$(win).width(),wh=$(win).height();
 	        var _id="jw-dialog-"+new Date().getTime(),header;
-	        var _style="top:"+(0.75*(wh-option.height)/2+$(win).scrollTop())+"px;left:"+((ww-option.width)/2+$(win).scrollLeft())+"px;width:"+option.width+"px;height:"+option.height+"px";
+	        var _style="top:"+(0.75*wh/2+$(win).scrollTop())+"px;left:"+(ww/2+$(win).scrollLeft())+"px;width:1px;height:1px";
 	        var dialog="<div class='jw-dialog' id='"+_id+"' style='"+_style+"'><div class='jw-dialog-hd'></div><div class='jw-dialog-bd'></div></div>";
 	        _style=null;
 	        dialog=$(win.document.body).append(dialog).find("#"+_id);
@@ -181,15 +181,15 @@
 	        	 wh=$(win).height();
 	         });
 	        setTimeout(function(){
-//		        toCenter();
 		        dialog.css('z-index',option.zIndex);
-     	       setSize(option.width,option.height);
+     	        setSize(option.width,option.height);
 	         },0);
 	        if(option.id){
-    	        	bd.append(option.id);
+	        	   var a=$(option.id);
+    	        	bd.append(a);
+    	        	autoBounds();
 	         }
-	        var th=26;//hd的高度
-//	        var th=dialog.height()-bd.height();//hd的高度
+	        var th=hd.height();//hd的高度
 	       
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
@@ -203,12 +203,7 @@
 	        function setTitle(title){
 	        	 option.title!==false && header.find('.jw-title').text(title);
 	         }
-	     	 var isSameDomain=(!!option.id ||!!option.rel) && !option.iframe;
-	     	 if(!isSameDomain){
-	     		 var _ifr_url=jw.parseUrl(option.iframe);
-	     		isSameDomain=_ifr_url['hostname']==location.hostname;
-	     		_ifr_url=null;
-	     	 }
+	     	
 	        function setSize(width,height){
 	        	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
 	        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
@@ -216,20 +211,19 @@
 	        };
 	           
 	          function autoBounds(_w,_h){
-	        	   var h=Math.min(Math.max(isSameDomain?(_h||dialog.height()):option.height,140),wh-5);
-	     		   var w=Math.min(Math.max(isSameDomain?(_w||dialog.width()):option.width,300),ww);
+	        	   var h=Math.min(Math.max(_h,bd.height(),option.height,140),wh-5);
+	     		   var w=Math.min(Math.max(_w,dialog.width(),option.width,300,bd.width()),ww);
 		          var top=0.75*(wh-h)/2+$(win).scrollTop(),
 		        	    left=(ww-w)/2+$(win).scrollLeft();
 		             setBounds(top,left,w,h);
 	           }
 	           
 	          function setBounds(top,l,width,height){
+	        	 if(!width || !height)return;
 	        	  width=Math.min(width,ww);
-	        	  height=Math.min(height,wh);
-//	        	  try{
+	        	  height=Math.min(height,wh-th);
 	        	  dialog.animate({top:top,left:l,width:width,height:height+th});
-//	        	  }catch(e){alert(e.message)}
-	        	  if(isSameDomain && !option.iframe && !isMax){
+	        	  if(!option.iframe && !isMax){
 	        		  bd.css('height','auto');
 	        	  }else{
 	        		  bd.animate({height:height});
@@ -242,7 +236,7 @@
 	           
 	          var last={},lastMaxClickTime=0;
 	          function close(e){
-	        	   if(e)e.stopPropagation();
+	        	     if(e)e.stopPropagation();
 	          	     that.over('close');
 	          	     if( $.isFunction(option.closeFn) && false===option.closeFn()){
 	          	    	 return false; 
@@ -255,9 +249,7 @@
 	           function max(e){
 	        	   if(e)e.stopPropagation();
 	        	   var cTime=new Date().getTime();
-	        	   if(cTime-lastMaxClickTime<300){
-	        				  return false;
-	        		  }
+	        	   if(cTime-lastMaxClickTime<300)return false;
 	        	   lastMaxClickTime=cTime;
 	        	   if(isMax){
 	        		   isMax=false;
@@ -265,7 +257,7 @@
 	        	   }else{
 	        		   isMax=true;
 		        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:bd.height()};
-		        	   setBounds($(win).scrollTop(),1,ww,wh-(dialog.height()-bd.height()));
+		        	   setBounds($(win).scrollTop(),1,ww,wh-th);
 	        	   }
 	        	   var _max=header.find('.max');
 	        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
@@ -278,54 +270,44 @@
 	        	 dialog.css({top:0.75*(wh-h)/2,left:(ww-w)/2,width:w,height:h+th});
 	      	     bd.height(h);
 	          }
-	         var ifr;
 	         
 	         if(option.rel){
 	             bd.empty().load(option.rel,function(){
-	            	 var _h=Math.max(bd.height(),op.height||0);
-	            	 var _w=Math.max(dialog.width(),op.width||0);
-	            	 autoBounds(_w,_h);
+	            	 autoBounds(bd.width(),bd.height());
 	            	});
 	         }else if(option.iframe){
-		         	ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
+		        var ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
 		         	ifr=bd.append(ifr).find('.iframe');
-		         	if(isSameDomain){
-		         		_iframe_load();
-		         	}else{
-		        		autoBounds();
-		         	}
-	         }else{
-	        	 autoBounds();
+		         	ifr.load(function(){
+		         		 var c=null,cl=0;
+		         		 try{ c=$(this).contents(); cl=$('body',c).html().length;}catch(e){}
+		               if(c){
+			               if(cl>0){
+			            	    var h=0,w=0;
+				               c.find('.close').click(close).end().find('.max').click(max);
+				               $('body',c).bind('close',close);
+				               if(option.iframeFetchTitle){
+					               var it=c.attr('title');
+					               if(it.length)setTitle(it);
+					              }
+				               setTimeout(function(){
+				            	    dialog.width(300);
+					               bd.height(100);
+				            	   setSize(c.width(),c.height());},5);//use timeout to fix ie
+			               }else{
+			                	 setSize(option.width,option.height);
+			                 }
+		               }else{
+		            	   autoBounds();
+		               } 
+		         	});
 	         }
-	         //iframe load 事件 处理
-	         function _iframe_load(){
-	    		ifr.load(function(){
-	         		 var c=$(this).contents(),h=0,w=0;
-	               if(!c)return;
-	               if($('body',c).html().length>0){
-		               c.find('.close').click(close).end().find('.max').click(max);
-		               $('body',c).bind('close',close);
-		               if(option.iframeFetchTitle){
-			               var it=c.attr('title');
-			               if(it.length)setTitle(it);
-			               }
-		               dialog.width(300);
-		               bd.height(100);
-		               h=Math.max(c.height(),op.height||0);
-		               w=Math.max(c.width()+20,op.width||0);
-		               setTimeout(function(){
-    		            	 setSize(w,h);
-		                 },5);//use timeout to fix ie
-	               }else{
-	                	 setSize(option.width,option.height);
-	                 }
-	         	});
-	          }
+	       
 	        var fn=function(){autoBounds();dialog.is(":visiable")&&that.over();};
 	        $(win).resize(fn);
 	        option.fixed && $(win).scroll(autoBounds);
 	        dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
-	        if(option.close!=false){
+	        if(option.close!==false){
 	        	$(win).keydown(function(e){
 	        		e.keyCode==27 && close();
 	        	});
