@@ -92,13 +92,13 @@
 	
 	
 	 //控件拖动支持
-	 drag:function(bar,target){
+	 drag:function(bar,target,win){
 	     var b=$(bar),t=target?$(target):b,x,y,moving=false,opacity,zi;
 	      var _p=t.css('position');
 	      if(_p!='absolute' && _p!='fixed'){
-	    	  t.css('position','absolute');
+	    	  t.css('position',"absolute");
 	      }
-	      _p=null;
+	      win=win||window;
 		  var ifr=t.find('iframe'),over=null;
 	      b.mousedown(function(e){
 	    	  zi=zi||t.css('z-index');
@@ -106,6 +106,7 @@
 	            x= e.clientX;
 	            y= e.clientY;
 	            moving=true;
+	            _p=t.css('position')
 				  b.css('cursor', 'move');
 	            t.css({'opacity':opacity*0.7,'z-index':90000});
 	            if(ifr){
@@ -116,16 +117,19 @@
 	          		  ifr.after(over);
 	            	},1);
 	          	  };
-	            $(document.body).mousemove(function(e1){
-	                 if(moving){
-	                   var offset=t.offset();
-	                    t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
-	                    x=e1.clientX;
-	                    y=e1.clientY;
-	                    }
-	                 return false;
-	            }).mouseup(stop);
 	        return false;    
+	      }).mouseup(stop);
+	      $(win.document.body).mousemove(function(e1){
+	    	  if(moving){
+	    		  var offset=t.offset();
+	    		  if(_p=='fixed'){
+	    			  offset={top:offset.top-$(win).scrollTop(),left:offset.left-$(win).scrollLeft()};
+	    		  }
+	    		  t.css({top:offset.top+(e1.clientY-y),left:offset.left+(e1.clientX-x)});
+	    		  x=e1.clientX;
+	    		  y=e1.clientY;
+	    	  }
+	    	  return false;
 	      }).mouseup(stop);
 	      function stop(e){
 	         moving=false;
@@ -194,7 +198,7 @@
     	        	bd.append(a);
     	        	autoBounds();
 	         }
-	        var th=hd.height();//hd的高度
+	        var th=hd.outerHeight();//hd的高度
 	       
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
@@ -317,7 +321,7 @@
 	        		e.keyCode==27 && close();
 	        	});
 	        }
-	        option.drag && this.drag(header,dialog);
+	        option.drag && this.drag(header,dialog,win);
 	        return {close:close,setSize:setSize,setBounds:setBounds,setLocation:setLocation,setTitle:setTitle};
 	    },
 	    
