@@ -5,32 +5,6 @@
 	
 	window.jw={
 	version: "1.0",
-	//url 地址解析
-	parseUrl:function(url){
-		 //若是ie浏览器，相对地址 如 jquery/widget.html 并不能正常识别
-		 if($.browser.msie){
-			 var b=/^[A-Za-z]+:/;
-			 if(!b.test(url)){
-				 if(url.substring(0,1)!="/"){
-					 url=location.protocol+"//"+location.host+location.pathname.substring(0,location.pathname.lastIndexOf("/")+1)+url;
-				 }else{
-					 url=location.protocol+"//"+location.host+url;
-				 }
-			 }
-		 }
-		 var a=document.createElement('a');
-		 a.href=url;
-		 var names=['href','protocol','host','hostname','port','pathname','search','hash'],
-		     result={},
-		      i;
-			 for(i=0;i<names.length;i++){
-				 result[names[i]]=a[names[i]];
-			 }
-		 result['query']=result['search'].replace(/^\?/,'');
-		 a=names=null;
-		 return result;
-    },
-    
     
     //tab 选项卡
     tab:function(headItems, contentItems,fn) {
@@ -106,7 +80,7 @@
 	            x= e.clientX;
 	            y= e.clientY;
 	            moving=true;
-	            _p=t.css('position')
+	            _p=t.css('position');
 				  b.css('cursor', 'move');
 	            t.css({'opacity':opacity*0.7,'z-index':90000});
 	            if(ifr){
@@ -415,6 +389,7 @@
     	$('#'+id+"_ok",div).click(function(){call_bk(ext.okFn);});
     	$('#'+id+"_cannel",div).click(function(){call_bk(ext.cannel);});
     	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false,width:350});
+    	if(ext.time)setTimeout(function(){ja.close()},ext.time);
       };
     $.extend(jw,{alert:jwalert}); 
 })(jQuery);
