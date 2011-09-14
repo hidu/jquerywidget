@@ -1,5 +1,5 @@
 
-(function(){
+(function($){
 	window.jw=window.jw||{};
 	if(window.jw.version)return;
 	
@@ -113,8 +113,8 @@
 	            	//通过使用timeout修正当窗体大小发生变化时，iframe的高度需要时变化后的高度以保证当前鼠标不进入iframe中
 	            	setTimeout(function(){
 	          		  var h=ifr.height();
-	          		  over=$("<div style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
-	          		  ifr.after(over);
+	          		  over=("<div class='jw-drag-over' style='position: relative;width:100%;height:"+h+"px;margin-top:-"+h+"px;'></div>");
+	          		  over=ifr.after(over).next('.jw-drag-over');
 	            	},1);
 	          	  };
 	        return false;    
@@ -142,7 +142,6 @@
 	 
 	   /**
 	    *弹出框
-	    *  .jw-dialog-title  可以不添加
 	    * 在dialog 容器内的元素 具有 .close 属性 则click时 可以关闭该dialog
 	    *@param id                需要以dialog 形式显示的层的 ID
 	    *@param option.title      标题。当设置为false 时，不显示标题
@@ -152,7 +151,7 @@
 	    *@param option.iframe     对上述rel 属性使用iframe 页面加载
 	    *@param option.width      宽度(可以用%)
 	    *@param option.height     高度(不使用%）
-	    *@param option.fixed     是否允许dialog 随着页面滚动(一直居中)
+	    *@param option.fixed     是否允许dialog 随着页面滚动
 	    *@param option.over      默认若为true,显示笼罩背景
 	    *@param option.drag       是否允许拖动，默认允许
 	    *@param option.maxFn      最大化事件
@@ -185,6 +184,7 @@
 	        var hd=$('.jw-dialog-hd',dialog);
 	        var isMax=false;
 	        var that=this;
+	        var th=hd.outerHeight();//hd的高度
 	        $(win).resize(function(){
 	        	 ww=$(win).width();
 	        	 wh=$(win).height();
@@ -194,16 +194,14 @@
      	        setSize(option.width,option.height);
 	         },0);
 	        if(option.id){
-	        	   var a=$(option.id);
-    	        	bd.append(a);
+    	        	bd.append(option.id);
     	        	autoBounds();
 	         }
-	        var th=hd.outerHeight();//hd的高度
 	       
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
-	              header="<table style='width:100%'><tr><td>"+
-	                         "<div class='jw-title'>"+(option.title||'')+"</div></td><td width='55px' style='text-align:right'><nobr>";
+	              header="<table width='100%'><tr><td>"+
+	                         "<div class='jw-title'>"+(option.title||'&nbsp;')+"</div></td><td style='width:55px;text-align:right'><nobr>";
 	             option.max!=false && (header+=_div+" class='max'>□</a></span>");
 	             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></span>");
 	             header+="</nobr></td></tr></table>";
@@ -220,8 +218,8 @@
 	        };
 	           
 	          function autoBounds(_w,_h){
-	        	   var h=Math.min(Math.max(_h,bd.height(),option.height,140),wh-5-th);
-	     		   var w=Math.min(Math.max(_w,dialog.width(),option.width,300,bd.width()),ww);
+	        	   var h=Math.min(Math.max(_h||0,option.height,140),wh-5-th);
+	     		   var w=Math.min(Math.max(_w||0,dialog.width(),option.width,300,bd.width()),ww);
 		          var top=0.75*(wh-h)/2+$(win).scrollTop(),
 		        	    left=(ww-w)/2+$(win).scrollLeft();
 		             setBounds(top,left,w,h);
@@ -282,7 +280,7 @@
 	         
 	         if(option.rel){
 	             bd.empty().load(option.rel,function(){
-	            	 autoBounds(bd.width(),bd.height());
+	            	 setTimeout(function(){ autoBounds(bd.width(),bd.height());},10);
 	            	});
 	         }else if(option.iframe){
 		        var ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
@@ -300,8 +298,8 @@
 					               if(it.length)setTitle(it);
 					              }
 				               setTimeout(function(){
-				            	    dialog.width(Math.max(300,dialog.width));
-					               bd.height(Math.max(100,bd.width()));
+				            	    dialog.width(300);
+					               bd.height(100);
 				            	    setSize(c.width(),c.height());},5);//use timeout to fix ie
 			               }else{
 			                	 setSize(option.width,option.height);
@@ -311,7 +309,18 @@
 		               } 
 		         	});
 	         }
-	       
+	         
+	         //没有遮罩层时，可能会有有多个dialog
+	        if(!option.over){
+	        	dialog.click(function(){
+	        		var _max=option.zIndex;
+	        		$('.jw-dialog',win.document).not(dialog).each(function(){
+	        			_max=Math.max(_max,parseInt($(this).css('z-index'))+1);
+	        		});
+	        		dialog.css('z-index',_max);
+	        	});
+	          }
+	        
 	        var fn=function(){autoBounds();dialog.is(":visiable")&&that.over();};
 	        $(win).resize(fn);
 	        option.fixed && setTimeout(function(){that.position_fixed(dialog,win);},1000);
@@ -378,14 +387,13 @@
     	var id="jwalert"+new Date().getTime();
     	var style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;";
     	var code="<div class='jw-alert'>" +
-	    			"<table style='width:100%'>" +
-	    			"<tr><td width='60'><div class='jw-icon' style='"+style+"'></div></td><td>"+(text||'')+"</td></tr>" +
-	    			"</table><center>" +
+	    			"<div class='icon' style='"+style+"'></div><div class='bd'>"+(text||'')+"</div><div style='clear:both'></div>" +
+	    			"<div class='ft'>" +
 	    			"<input type='button' value='&nbsp;确 定&nbsp;' id='"+id+"_ok' />";
 			if(!!ext.cannel){
 				code+="&nbsp;&nbsp;<input type='button' value='&nbsp;取 消&nbsp;' id='"+id+"_cannel' />";
 			}
-	    	code+="</center></div>";
+	    	code+="</div></div>";
     	var div=$(code);
     	var ja=null;
 //    	div.appendTo(document.body);
@@ -398,7 +406,7 @@
     	};
     	$('#'+id+"_ok",div).click(function(){call_bk(ext.okFn);});
     	$('#'+id+"_cannel",div).click(function(){call_bk(ext.cannel);});
-    	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false});
+    	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false,width:350});
       };
     $.extend(jw,{alert:jwalert}); 
 })(jQuery);
