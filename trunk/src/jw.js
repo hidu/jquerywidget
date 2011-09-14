@@ -285,7 +285,15 @@
 	         }else if(option.iframe){
 		        var ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
 		         	ifr=bd.append(ifr).find('.iframe');
+		         	var isLoaded=false,loading=null;
+		         	setTimeout(function(){
+		         		if(isLoaded)return;
+		         		loading="<div class='jw-dialog-loading' style='position: relative;width:100%;height:"+option.height+"px;margin-top:-"+option.height+"px;'><div style='margin-top:"+option.height/2+"px'>&nbsp;</div></div>";
+		         		loading=bd.append(loading).find('.jw-dialog-loading');
+		         	},100);
 		         	ifr.load(function(){
+		         		isLoaded=true;
+		         		if(loading){loading.remove();loading=null;}
 		         		 var c=null,cl=0;
 		         		 try{ c=$(this).contents(); cl=$('body',c).html().length;}catch(e){}
 		               if(c){
