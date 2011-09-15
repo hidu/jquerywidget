@@ -33,7 +33,7 @@ $().ready(function(){
 <input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:600});" value="dialog iframe">
 <input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:300,over:false});" value="dialog iframe no over">
 
-<input type="button" onclick="jw.dialog({iframe:'iframe.html'});" value="dialog idrame2">
+<input type="button" onclick="jw.dialog({iframe:'iframe.html',onLoad:function(){alert('ok')}});" value="dialog idrame2">
 <input type="button" onclick="jw.msg('你好'+Math.random());" value="jw.msg">
 <br/>adassasa
 <a onclick="jw.dialog({rel:'_load.html'});return false;">test</a>
