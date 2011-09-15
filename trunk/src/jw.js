@@ -128,8 +128,8 @@
 	    *@param option.fixed     是否允许dialog 随着页面滚动
 	    *@param option.over      默认若为true,显示笼罩背景
 	    *@param option.drag       是否允许拖动，默认允许
-	    *@param option.maxFn      最大化事件
-	    *@param option.closeFn    关闭事件
+	    *@param option.onMax      最大化事件
+	    *@param option.onClose    关闭事件
 	    */
 	  dialog:function(option){
 	    	var op=option||{};
@@ -144,6 +144,7 @@
 			     iframeScroll:true,
 			     iframeFetchTitle:true,
 			     zIndex:301,
+			     onLoad:function(){},
 			     target:window
 			},op);
 	    	var win=option.target;
@@ -219,7 +220,7 @@
 	          function close(e){
 	        	     if(e)e.stopPropagation();
 	          	     that.over('close');
-	          	     if( $.isFunction(option.closeFn) && false===option.closeFn()){
+	          	     if( $.isFunction(option.onClose) && false===option.onClose()){
 	          	    	 return false; 
 	          	      };
 	          	     dialog.animate({top:wh/2,left:ww/2,width:0,height:0},function(){
@@ -242,7 +243,7 @@
 	        	   }
 	        	   var _max=header.find('.max');
 	        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
-	        	   typeof option.maxFn=='function' && option.maxFn();
+	        	   typeof option.onMax=='function' && option.onMax();
 	            }
 	          
 	         function toCenter(w,h){
@@ -255,6 +256,7 @@
 	         if(option.rel){
 	             bd.empty().load(option.rel,function(){
 	            	 setTimeout(function(){ autoBounds(bd.width(),bd.height());},10);
+	            	 setTimeout(function(){option.onLoad();},100);
 	            	});
 	         }else if(option.iframe){
 		        var ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
@@ -288,8 +290,11 @@
 			                 }
 		               }else{
 		            	   autoBounds();
-		               } 
+		               }
+		               option.onLoad();
 		         	});
+	         }else{
+	        	 option.onLoad();
 	         }
 	         
 	         //没有遮罩层时，可能会有有多个dialog
