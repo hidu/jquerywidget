@@ -1,5 +1,5 @@
 
-.dq_ajaxLoding{margin-left: 40%;display: inherit;}
+.dq_loding{margin-left: 40%;display: inherit;}
 .dq_loadingImg{background-image: url(loading36.gif);display: inherit;width:128px;height:15px;}
 
 /*dq.trSelect*/
@@ -34,8 +34,3 @@ table tr.dq_select{background: #CFE7FF;}
 .dq_pager li a { border: 1px solid #9AAFE5; padding: 2px 6px 2px 6px; display: block;text-decoration: none;}
 .dq_pager li a:hover { border: 1px solid #2E6AB1;}
 */
-
-.dq_dialog_over {position:absolute;top:0;left:0;width:100%;background-color:#000;z-index:300;display:block; filter: alpha(opacity=30);-moz-opacity: 0.3;opacity: 0.3; }
-.dq_dialog{position:absolute;width:380px;border:1px solid #666;background:#fff;z-index:301;}
-.dq_dialog_title{background:#0066CC;color:#FFFFFF;font-weight:bold;padding:5px 10px;}
-.dq_dialog_title a{color:white;}

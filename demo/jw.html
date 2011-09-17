@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>jw demo</title>
+<link rel="stylesheet" type="text/css" media="screen" href="../src/jw.css" />
+
+<script src="jquery-1.6.2.js"></script>
+<script src="../src/jw.js"></script>
+</head>
+<body>
+<h1>dialog</h1>
+<p><input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:600});" value="iframe 不同域名"></p>
+<p><input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:300,over:false});" value="iframe 没有遮罩层"></p>
+
+<p><input type="button" onclick="jw.dialog({iframe:'iframe.html'});" value="iframe 同域名,自适应大小"></p>
+<p><input type="button" onclick="jw.dialog({iframe:'iframe.html',title:'我的标题',iframeFetchTitle:false});" value="iframe 同域名,不使用iframe的title"></p>
+<p><button onclick="jw.dialog({rel:'_load.html'});return false;">ajax加载内容</button></p>
+<p><input type="button" onclick="jw.dialog({iframe:'iframe.html',target:window.top});" value="iframe 同域名的最上层窗口创建"></p>
+<hr/>
+
+<h1>alert</h1>
+<p><input type="button" onclick="jw.alert('这是一个alert!');" value="默认图标"></p>
+<p><input type="button" onclick="jw.alert('这是一个alert!','5');" value="指定图标"></p>
+<p><input type="button" onclick="jw.alert('这是一个alert!','5','',{time:2000});" value="alert 2'后关闭"><br/></p>
+<p><input type="button" onclick="jw.alert('这是一个alert1111111111111111111!你好，你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好','5');" value="alert"><br/></p>
+<hr/>
+
+<h1>msg</h1>
+<p><input type="button" onclick="jw.msg('你好'+Math.random());" value="默认显示提示信息"></p>
+<p><input type="button" onclick="jw.msg('你好,这个停留显示5秒,隐藏时弹出对话框',5000,function(){alert('5秒后')});" value="5秒回调"></p>
+<hr/>
+
+<h1>drag</h1>
+<div id="drag001" style='border:1px solid blue;width:300px'>drag me 1</div><br/>
+<div id="drag003" style='border:1px solid blue;width:300px'>drag me 3</div>
+<div id="drag002" style='border:1px solid blue;position:fixed;top:50px;right:20px;width:200px'>drag me but i'm fixed</div>
+<br/>
+<div id="drag004" style='border:1px solid blue; width:300px;height:200px'>
+	<div class="hd" style='background:gray;'>drag me 3</div>
+	<div>this is body
+	 <div>jw.drag("#drag004 .hd","#drag004");</div>
+	</div>
+</div>
+<script>
+$().ready(function(){
+  jw.drag("#drag001");
+  jw.drag("#drag002");
+  jw.drag("#drag003");
+  jw.drag("#drag004 .hd","#drag004");
+  
+  $('p').each(function(){
+	  $(this).append("<br/>"+$(this).html().replace(/</g,"&lt;").replace(/>/g,"&gt;"));
+  });
+});
+</script>
+<hr/>
+
+<div id="fixed01" style="position:fixed;top:100px;right:20px;width:300px;height:250px;border:1px solid red">
+<h1>position_fixed</h1>
+元素窗口位置固定，支持ie6。<br/>
+使用如下样式：
+<div>position:fixed; top:100px; right:20px; width:200px; height:200px;</div>
+&lt;script&gt;<br/>
+jw.position_fixed("#fixed01");<br/>
+&lt;/script&gt;<br/>
+</div>
+<script>
+jw.position_fixed("#fixed01");
+</script>
+</body>
+</html>
