@@ -21,9 +21,38 @@
 
 <h1>alert</h1>
 <p><input type="button" onclick="jw.alert('这是一个alert!');" value="默认图标"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!','5');" value="指定图标"></p>
+<p><input type="button" onclick="jw.alert('这是一个alert!','5');" value="指定图标1"></p>
+<p><input type="button" onclick="jw.alert('这是一个alert!','4');" value="指定图标2"></p>
+<p><input type="button" onclick="jw.alert('这是一个alert!','13x2');" value="指定图标3"></p>
 <p><input type="button" onclick="jw.alert('这是一个alert!','5','',{time:2000});" value="alert 2'后关闭"><br/></p>
-<p><input type="button" onclick="jw.alert('这是一个alert1111111111111111111!你好，你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好','5');" value="alert"><br/></p>
+<div>
+<div>以下是所有的图标,每个图标尺寸为width=50px,height=50px</div>
+jw.alert('这是一个alert!','<font color=red>13x2</font>')表示使用坐标 x=13,y=2 位置的图标
+<br/><br/>
+
+<div>
+<div style="float:left;margin-top:30px">
+<script>
+var tmp="<div style='height:45px;width:30px;text-align:right;padding-right:10px'>";
+for(var i=1;i<5;i++){
+    document.write(tmp+i+"</div>");
+}
+document.write(tmp+"<font color=red>Y</font></div>");
+</script>
+</div>
+<div style="padding-left:30px">
+<script>
+var tmp="<span style='width:49px;display:inline-block;text-align:center'>";
+for(var i=1;i<20;i++){
+	document.write(tmp+i+"</span>");
+}
+document.write(tmp+"<font color=red>X</font></span>");
+</script>
+<div><img src="../src/jw-icons.gif" style="border:1px solid blue;border-bottom:none;border-right:none"></div>
+</div>
+</div>
+</div>
+<div style="clear:both"></div>
 <hr/>
 
 <h1>msg</h1>
@@ -32,21 +61,25 @@
 <hr/>
 
 <h1>drag</h1>
+<div style="height:300px">
 <div id="drag001" style='border:1px solid blue;width:300px'>drag me 1</div><br/>
 <div id="drag003" style='border:1px solid blue;width:300px'>drag me 3</div>
 <div id="drag002" style='border:1px solid blue;position:fixed;top:50px;right:20px;width:200px'>drag me but i'm fixed</div>
 <br/>
 <div id="drag004" style='border:1px solid blue; width:300px;height:200px'>
-	<div class="hd" style='background:gray;'>drag me 3</div>
+	<div class="hd" style='background:gray;width:100%'>drag me 3</div>
 	<div>this is body
 	 <div>jw.drag("#drag004 .hd","#drag004");</div>
 	</div>
+</div>
 </div>
 <script>
 $().ready(function(){
   jw.drag("#drag001");
   jw.drag("#drag002");
+  jw.position_fixed("#drag002");
   jw.drag("#drag003");
+  
   jw.drag("#drag004 .hd","#drag004");
   
   $('p').each(function(){
