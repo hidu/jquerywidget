@@ -4,7 +4,7 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "1.0",
+	version: "20110917 1.0",
     
     //tab 选项卡
     tab:function(headItems, contentItems,fn) {
@@ -69,12 +69,12 @@
 	 drag:function(bar,target,win){
 	     var b=$(bar),t=target?$(target):b,x,y,moving=false,opacity,zi;
 	      var _p=t.css('position');
-	      if(_p!='absolute' && _p!='fixed'){
-	    	  t.css('position',"absolute");
-	      }
 	      win=win||window;
 		  var ifr=t.find('iframe'),over=null;
 	      b.mousedown(function(e){
+	    	  if(_p!='absolute' && _p!='fixed'){
+	    		  t.css('position',"absolute");
+	    	  }
 	    	  zi=zi||t.css('z-index');
 	    	  opacity=opacity||t.css('opacity')||1.0;
 	            x= e.clientX;
@@ -223,7 +223,7 @@
 	          	     if( $.isFunction(option.onClose) && false===option.onClose()){
 	          	    	 return false; 
 	          	      };
-	          	     dialog.animate({top:wh/2,left:ww/2,width:0,height:0},function(){
+	          	     dialog.animate({top:wh/2+$(win).scrollTop(),left:ww/2,width:0,height:0},function(){
 	          	    	dialog.remove();
 	          	     });
 	           }
@@ -254,9 +254,9 @@
 	          }
 	         
 	         if(option.rel){
-	             bd.empty().load(option.rel,function(){
-	            	 setTimeout(function(){ autoBounds(bd.width(),bd.height());},10);
-	            	 setTimeout(function(){option.onLoad();},100);
+	             bd.css('height','auto').empty().load(option.rel,function(){
+	            	 setTimeout(function(){ autoBounds(bd.width(),bd.height());},100);
+	            	 setTimeout(function(){option.onLoad();},150);
 	            	});
 	         }else if(option.iframe){
 		        var ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
@@ -311,7 +311,7 @@
 	        var fn=function(){autoBounds();dialog.is(":visiable")&&that.over();};
 	        $(win).resize(fn);
 	        option.fixed && setTimeout(function(){that.position_fixed(dialog,win);},1000);
-	        dialog.bind('close',close).find('.close').click(close).mousedown(close).end().find('.max').click(max).mousedown(max);
+	        dialog.bind('close',close).find('.close').live('click mousedown',close).end().find('.max').live('click mousedown',max);
 	        if(option.close!==false){
 	        	$(win).keydown(function(e){
 	        		e.keyCode==27 && close();
@@ -393,7 +393,7 @@
     	};
     	$('#'+id+"_ok",div).click(function(){call_bk(ext.okFn);});
     	$('#'+id+"_cannel",div).click(function(){call_bk(ext.cannel);});
-    	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false,width:350});
+    	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false,width:350,over:false});
     	if(ext.time)setTimeout(function(){ja.close()},ext.time);
       };
     $.extend(jw,{alert:jwalert}); 

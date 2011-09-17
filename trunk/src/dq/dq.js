@@ -32,19 +32,19 @@
        * 需要在样式表中设置 .loadingImg 
        *@param target string ajax 装载目标
        */
-       ajaxLoading:function(target){
+       loading:function(target){
          var t=$(target);
          var h=t.height();
          if(h<70){h=80;}else if(h>500){h=300;}
          var i=0,nbsp='&nbsp;&nbsp;&nbsp;&nbsp;';
-         if(!this.ajaxLoading_nbsp){
+         if(!this.loading_nbsp){
              while(i<3){
                nbsp+=nbsp;
                i++;
              }
-             this.ajaxLoading_nbsp=nbsp;
+             this.loading_nbsp=nbsp;
          }
-          t.empty().html("<div class='dq_ajaxLoding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<br/><span class='dq_loadingImg'>"+this.ajaxLoading_nbsp+"</span></div>");
+          t.empty().html("<div class='dq_loding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<br/><span class='dq_loadingImg'>"+this.loading_nbsp+"</span></div>");
         },
     /**
      *@exmaple 1  使用Ajax进行表单查询  将查询内容显示在 dic#ret 中
@@ -131,10 +131,10 @@
             submitEnable(false);
             var qstring = $.param(formData);
             if(targetID){
-                 that.ajaxLoading(targetID);
+                 that.loading(targetID);
                  if(ext.reload){
 		               $(targetID).attr('rel',options.url+'?'+qstring).unbind('reload').bind('reload',function(){
-		                      that.ajaxLoading(targetID);
+		                      that.loading(targetID);
 		                      $(this).load($(this).attr('rel'));
 		                      return;
 		                  });
@@ -224,9 +224,9 @@
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
              that.centerIt(target);
-             that.ajaxLoading(targetID);
+             that.loading(targetID);
              target.attr('rel',rel).load(rel).unbind('reload').bind('reload',function(e){
-                  that.ajaxLoading(targetID);
+                  that.loading(targetID);
                   $(this).load($(this).attr('rel'));
                   return false;
              });
@@ -268,7 +268,7 @@
         pager.find("a").click(function(){
         	try{
         		that.centerIt(target);
-              that.ajaxLoading(target);
+              that.loading(target);
               var rel=$(this).attr('href');
               target.attr('rel',rel).load(rel);
         	}catch(e){}
@@ -278,7 +278,7 @@
         //给容器 绑定自定义事件 reload
         !target.attr('rel') && target.attr('rel',$('li.current',pager).attr('rel'));
         target.unbind('reload').bind('reload',function(){
-             that.ajaxLoading(target);
+             that.loading(target);
              $(this).load($(this).attr('rel'));
         });
                
@@ -361,9 +361,9 @@
        var that=this;
        $("a["+attr+"]").live('click',function(){
            var t=$($(this).attr(attr));
-           that.ajaxLoading(t);
+           that.loading(t);
            t.data('url',this.href).load(this.href).unbind('reload').bind('reload',function(){
-               that.ajaxLoading(t);
+               that.loading(t);
                t.load(t.data('url'));
                return false;
             });
