@@ -367,34 +367,34 @@
      * @param title 提示标题
      * @fn 点击确定时的回调函数 
      */
-    var jwalert=function(text,ico,title,ext){
-    	ico=((ico||1)+"").split("x");
-    	ext=ext||{};
+    var jwalert=function(text,option){
+    	option=$.extend({},{icon:1,
+                  	   ok:"确 定",
+	    		          onOk:function(){},
+	    		          cancle:null,
+	    		          onCancle:function(){},
+	    		          title:'提示',
+	    		          },option||{});
+    	var ico=(option.icon+"").split("x");
     	var x=ico[0],y=ico.length==2?ico[1]:1;
     	var id="jwalert"+new Date().getTime();
     	var style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;";
     	var code="<div class='jw-alert'>" +
 	    			"<div class='icon' style='"+style+"'></div><div class='bd'>"+(text||'')+"</div><div style='clear:both'></div>" +
 	    			"<div class='ft'>" +
-	    			"<input type='button' value='&nbsp;确 定&nbsp;' id='"+id+"_ok' />";
-			if(!!ext.cannel){
-				code+="&nbsp;&nbsp;<input type='button' value='&nbsp;取 消&nbsp;' id='"+id+"_cannel' />";
+	    			"<input type='button' value='&nbsp;"+option.ok+"&nbsp;' id='"+id+"_ok' />";
+			if(option.cancle!=null){
+				code+="&nbsp;&nbsp;<input type='button' value='&nbsp;"+option.cancle+"&nbsp;' id='"+id+"_cannel' />";
 			}
 	    	code+="</div></div>";
     	var div=$(code);
+    	style=x=ico=null;
     	var ja=null;
-//    	div.appendTo(document.body);
-    	var call_bk=function(fn){
-    		if(ext){
-    			var rt=(typeof fn=='function'?fn:(typeof ext=='function'?ext:function(){}))();
-    			if(rt===false)return;
-    		} 
-    		ja.close();
-    	};
-    	$('#'+id+"_ok",div).click(function(){call_bk(ext.okFn);});
-    	$('#'+id+"_cannel",div).click(function(){call_bk(ext.cannel);});
-    	ja=jw.dialog({id:div,max:false,title:title||'提示',fixed:false,width:350,over:false});
-    	if(ext.time)setTimeout(function(){ja.close()},ext.time);
+    	function call_bk(fn){if(fn()===false)return;ja.close();};
+    	$('#'+id+"_ok",div).click(function(){call_bk(option.onOk);});
+    	$('#'+id+"_cannel",div).click(function(){call_bk(option.onCancle);});
+    	ja=jw.dialog({id:div,max:false,close:false,title:option.title,fixed:false,width:350,over:false});
+    	if(option.time)setTimeout(function(){call_bk(option.onOk);},option.time);
       };
     $.extend(jw,{alert:jwalert}); 
 })(jQuery);
