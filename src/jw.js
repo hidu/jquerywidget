@@ -25,7 +25,7 @@
 	//笼罩层
 	over:function(opt){
 		opt=opt||'show';
-		var over,wh=$(window).height(),bh=$('body').outerHeight();
+		var over,wh=$(window).height(),bh=$('body').height();
 		if(opt=='show'){
 			if($('.jw-over').length)return;
 			over=$('<div class="jw-over" ></div>');
@@ -33,7 +33,7 @@
 				$(document.body).append(over);
 				$('html').addClass('jw-over-hidden');
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
-				over.height(bh+wh);
+				over.height(bh);
 			});
 		}else{
 			$('html').removeClass('jw-over-hidden');
@@ -46,18 +46,25 @@
 		target=$(target);
 		win=win||window;
 		var ie6=$.browser.msie && $.browser.version<=6; 
+		var pos=target.css('position');
 		if(!ie6){
-			target.css({position:'fixed'});
+			if(pos!='fixed'){
+				var of=target.offset();
+    				target.css({top:(of.top-$(win).scrollTop()),position:'fixed'});
+			}else{
+    			target.css({position:'fixed'});
+			}
     		return true;
 		}
-		target.css({position:'absolute'});
 		var bottom=parseInt(target.css('bottom'));
 		var top=parseInt(target.css('top'));
+		var topOf=pos=='absolute'?$(win).scrollTop():0;//若之前的position==absolute则需要进行修正
+		target.css({position:'absolute'});
 		function listen(){
 			if(bottom){
-    			target.css('top',($(win).height()+$(win).scrollTop()-bottom-40)).show();
+    			target.css({'top':($(win).height()+$(win).scrollTop()-bottom-40)}).show();
 			}else{
-    			target.css('top',($(win).scrollTop()+top)).show();
+    			target.css({'top':($(win).scrollTop()+top-topOf)}).show();
 			}
 		}
 		$(win).scroll(listen).resize(listen);
@@ -147,19 +154,22 @@
 			     onLoad:function(){},
 			     target:window
 			},op);
-	    	var win=option.target;
-	    	var ww=$(win).width(),wh=$(win).height();
-	        var _id="jw-dialog-"+new Date().getTime(),header;
-	        var _style="top:"+(0.75*wh/2+$(win).scrollTop())+"px;left:"+(ww/2+$(win).scrollLeft())+"px;width:1px;height:1px";
-	        var dialog="<div class='jw-dialog' id='"+_id+"' style='"+_style+"'><div class='jw-dialog-hd'></div><div class='jw-dialog-bd'></div></div>";
+	    	 var win=option.target,
+	    	     ww=$(win).width(),
+	    	     wh=$(win).height(),
+	            _id="jw-dialog-"+new Date().getTime(),header,
+	            _style="top:"+(0.75*wh/2+$(win).scrollTop())+"px;left:"+(ww/2+$(win).scrollLeft())+"px;width:1px;height:1px",
+	            dialog="<div class='jw-dialog' id='"+_id+"' style='"+_style+"'><div class='jw-dialog-hd'></div><div class='jw-dialog-bd'></div></div>";
 	        _style=null;
 	        dialog=$(win.document.body).append(dialog).find("#"+_id);
 	        option.over && this.over();
-	        var bd=$('.jw-dialog-bd',dialog);
-	        var hd=$('.jw-dialog-hd',dialog);
-	        var isMax=false;
-	        var that=this;
-	        var th=hd.outerHeight();//hd的高度
+	        var bd=$('.jw-dialog-bd',dialog),
+	            hd=$('.jw-dialog-hd',dialog),
+	            isMax=false,
+	            isFixed=false,
+	            that=this,
+	            th=hd.outerHeight();
+	        
 	        $(win).resize(function(){
 	        	 ww=$(win).width();
 	        	 wh=$(win).height();
@@ -191,12 +201,16 @@
 	        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
 	        	autoBounds(width,height);
 	        };
-	           
+	        function scrollPos(){
+	        	  return {top:isFixed?0:$(win).scrollTop(),left:isFixed?0:$(win).scrollLeft()};
+	          }
+	        
 	          function autoBounds(_w,_h){
+	        	    isFixed=dialog.css('position')=='fixed';
 	        	   var h=Math.min(Math.max(_h||0,option.height,140),wh-5-th);
 	     		   var w=Math.min(Math.max(_w||0,dialog.width(),option.width,300,bd.width()),ww);
-		          var top=0.75*(wh-h)/2+$(win).scrollTop(),
-		        	    left=(ww-w)/2+$(win).scrollLeft();
+		          var top=0.75*(wh-h)/2+scrollPos().top,
+		        	    left=(ww-w)/2+scrollPos().left;
 		             setBounds(top,left,w,h);
 	           }
 	           
@@ -215,6 +229,7 @@
 	          function setLocation(top,left){
 	        	  dialog.animate({top:top,left:left});
 	            }
+	        
 	           
 	          var last={},lastMaxClickTime=0;
 	          function close(e){
@@ -223,7 +238,7 @@
 	          	     if( $.isFunction(option.onClose) && false===option.onClose()){
 	          	    	 return false; 
 	          	      };
-	          	     dialog.animate({top:wh/2+$(win).scrollTop(),left:ww/2,width:0,height:0},function(){
+	          	     dialog.animate({top:wh/2+scrollPos().top,left:ww/2,width:0,height:0},function(){
 	          	    	dialog.remove();
 	          	     });
 	           }
@@ -238,8 +253,8 @@
 	        		   setBounds(last.top,last.left,last.width,last.height);
 	        	   }else{
 	        		   isMax=true;
-		        	   last={top:dialog.offset().top,left:dialog.offset().left,width:dialog.width(),height:bd.height()};
-		        	   setBounds($(win).scrollTop(),1,ww,wh-th);
+		        	   last={top:dialog.offset().top-(isFixed?$(win).scrollTop():0),left:dialog.offset().left,width:dialog.width(),height:bd.height()};
+		        	   setBounds(scrollPos().top,scrollPos().left,ww,wh-th);
 	        	   }
 	        	   var _max=header.find('.max');
 	        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
@@ -273,8 +288,7 @@
 		         		 var c=null,cl=0;
 		         		 try{ c=$(this).contents(); cl=$('body',c).html().length;}catch(e){}
 		               if(c){
-			               if(cl>0){
-			            	    var h=0,w=0;
+			               if(cl>0 ){
 				               c.find('.close').click(close).end().find('.max').click(max);
 				               $('body',c).bind('close',close);
 				               if(option.iframeFetchTitle){
@@ -284,7 +298,8 @@
 				               setTimeout(function(){
 				            	    dialog.width(300);
 					               bd.height(100);
-				            	    setSize(c.width(),c.height());},5);//use timeout to fix ie
+				            	    setSize(c.width(),c.height());
+				            	    },5);//use timeout to fix ie
 			               }else{
 			                	 setSize(option.width,option.height);
 			                 }
@@ -308,7 +323,7 @@
 	        	});
 	          }
 	        
-	        var fn=function(){autoBounds();dialog.is(":visiable")&&that.over();};
+	        var fn=function(){autoBounds();dialog.is(":visible")&&that.over();};
 	        $(win).resize(fn);
 	        option.fixed && setTimeout(function(){that.position_fixed(dialog,win);},1000);
 	        dialog.bind('close',close).find('.close').live('click mousedown',close).end().find('.max').live('click mousedown',max);
@@ -373,7 +388,7 @@
 	    		          onOk:function(){},
 	    		          cancle:null,
 	    		          onCancle:function(){},
-	    		          title:'提示',
+	    		          title:'提示'
 	    		          },option||{});
     	var ico=(option.icon+"").split("x");
     	var x=ico[0],y=ico.length==2?ico[1]:1;
@@ -390,11 +405,12 @@
     	var div=$(code);
     	style=x=ico=null;
     	var ja=null;
+    	var timer=null;
     	function call_bk(fn){if(fn()===false)return;ja.close();};
-    	$('#'+id+"_ok",div).click(function(){call_bk(option.onOk);});
+    	$('#'+id+"_ok",div).click(function(){timer && clearTimeout(timer);call_bk(option.onOk);});
     	$('#'+id+"_cannel",div).click(function(){call_bk(option.onCancle);});
     	ja=jw.dialog({id:div,max:false,close:false,title:option.title,fixed:false,width:350,over:false});
-    	if(option.time)setTimeout(function(){call_bk(option.onOk);},option.time);
+    	if(option.time)timer=setTimeout(function(){call_bk(option.onOk);},option.time);
       };
     $.extend(jw,{alert:jwalert}); 
 })(jQuery);
