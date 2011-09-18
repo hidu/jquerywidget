@@ -4,9 +4,25 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>jw demo</title>
 <link rel="stylesheet" type="text/css" media="screen" href="../src/jw.css" />
+<style>
+.jw-tab {border: 1px solid #CCCCCC;margin-bottom: 10px;width:400px;height:200px}
+.jw-tab .hd{height:28px;line-height: 28px; padding-right: 12px; text-align: right;background:#ccc}
+.jw-tab .hd ul{margin:0;padding:0}
+.jw-tab .hd li {float: left;height: 27px;line-height: 27px;padding: 0 20px;list-style:none;cursor: pointer;}
+.jw-tab .hd li.cur { background-color: #FFFFFF;font-weight: bold;border-bottom:1px solid #fff}
+.jw-tab .bd{padding:10px;}
 
+.demo,p{border:1px dashed gray;margin:10px;padding:10px}
+</style>
 <script src="jquery-1.6.2.js"></script>
 <script src="../src/jw.js"></script>
+<script>
+$(function(){
+	  $('p,.demo').each(function(){
+	      $(this).append("<br/>"+$(this).html().trim().replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>").replace(/\s/g,"&nbsp;"));
+	  });
+})
+</script>
 </head>
 <body>
 <h1>dialog</h1>
@@ -122,46 +138,43 @@ document.write(tmp+"<font color=red>X</font></span>");
 */
 <font color=blue>jw.drag(bar,target,win)</font>
 </pre>
-<div style="height:300px">
-<div id="drag001" style='border:1px solid blue;width:300px'>drag me 1</div><br/>
-<div id="drag003" style='border:1px solid blue;width:300px'>drag me 3</div>
+<div style="height:750px">
+
+<div class="demo">
+	<div id="drag001" style='border:1px solid blue;width:300px'>drag me 1</div>
+	<script>jw.drag("#drag001");</script>
+</div>
+
+<div class="demo">
 <div id="drag002" style='border:1px solid blue;position:fixed;top:50px;right:20px;width:200px'>drag me but i'm fixed</div>
-<br/>
-<div id="drag004" style='border:1px solid blue; width:300px;height:200px'>
-	<div class="hd" style='background:gray;width:100%'>drag me 3</div>
-	<div>this is body
-	 <div>jw.drag("#drag004 .hd","#drag004");</div>
-	</div>
-</div>
-</div>
 <script>
-$().ready(function(){
-  jw.drag("#drag001");
-  jw.drag("#drag002");
-  jw.position_fixed("#drag002");
-  jw.drag("#drag003");
-  
-  jw.drag("#drag004 .hd","#drag004");
-  
-  $('p').each(function(){
-	  $(this).append("<br/>"+$(this).html().replace(/</g,"&lt;").replace(/>/g,"&gt;"));
-  });
-});
+jw.drag("#drag002");
+jw.position_fixed("#drag002");
 </script>
+</div>
+
+<div class="demo">
+	<div id="drag004" style='border:1px solid blue; width:300px;height:200px'>
+		<div class="hd" style='background:gray;width:100%'>drag me 3</div>
+		<div>this is body
+		 <div>jw.drag("#drag004 .hd","#drag004");</div>
+		</div>
+	</div>
+	</div>
+	<script>
+	  jw.drag("#drag004 .hd","#drag004");
+	</script>
+</div>
+
 <hr/>
 
-<div id="fixed01" style="position:fixed;top:100px;right:20px;width:300px;height:250px;border:1px solid red;background:#fff">
 <h1>position_fixed</h1>
-元素窗口位置固定，支持ie6。<br/>
-使用如下样式：
-<div>position:fixed; top:100px; right:20px; width:200px; height:200px;</div>
-&lt;script&gt;<br/>
-jw.position_fixed("#fixed01");<br/>
-&lt;/script&gt;<br/>
+<div class="demo">
+<div id="fixed01" style="position:fixed;top:100px;right:20px;width:100px;height:100px;border:1px solid red;background:#fff">
+元素窗口位置固定，支持ie6。
 </div>
-<script>
-jw.position_fixed("#fixed01");
-</script>
+<script>jw.position_fixed("#fixed01");</script>
+</div>
 <hr/>
 
 <h1>tab选项卡</h1>
@@ -169,7 +182,8 @@ jw.position_fixed("#fixed01");
 <font color=blue>jw.tab(headItems, contentItems,fn)</font>
 </pre>
 
-<div id="tab01">
+<div class="demo">
+<div id="tab01" class='jw-tab'>
    <div class="hd"><ul><li><a>第一</a></li><li><a>第二</a></li></ul></div>
    <div class='bd'>
       <div>第一个选项卡的内容</div>
@@ -179,14 +193,8 @@ jw.position_fixed("#fixed01");
 <script>
 jw.tab("#tab01 .hd li","#tab01 .bd>div");
 </script> 
-<style>
-#tab01 {border: 1px solid #CCCCCC;margin-bottom: 10px;width:400px;height:200px}
-#tab01 .hd{height:28px;line-height: 28px; padding-right: 12px; text-align: right;background:#ccc}
-#tab01 .hd ul{margin:0;padding:0}
-#tab01 .hd li {float: left;height: 27px;line-height: 27px;padding: 0 20px;list-style:none;cursor: pointer;}
-#tab01 .hd li.cur { background-color: #FFFFFF;font-weight: bold;border-bottom:1px solid #fff}
-#tab01 .bd{padding:10px;}
-</style>
+</div>
+
 
 </body>
 </html>
