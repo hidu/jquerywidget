@@ -67,7 +67,7 @@
 <p><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000});" value="alert 2'后关闭"></p>
 <p><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000,onOk:function(){alert('马上关闭')}});" value="alert 2'后关闭,并执行回调"></p>
 <p><input type="button" onclick="jw.alert('这是一个alert!',{onOk:function(){alert(1)}});" value="点击确定时回调"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{cancle:'取消'});" value="显示取消按钮"></p>
+<p><input type="button" onclick="jw.alert('这是一个alert!',{cancle:'取消',onCancle:function(){alert('cancle')}});" value="显示取消按钮"></p>
 <p><input type="button" onclick="jw.alert('<input type=text id=\'a\'>',{title:'请输入',cancle:'取消',onOk:function(){var a=$('#a').val();if(a==''){alert('请输入内容');return false;}alert(a)}});" value="显示HTML(模拟confirm)（回调返回false阻止关闭）"></p>
 <div>
 <div>以下是所有的图标,每个图标尺寸为width=50px,height=50px</div>
@@ -100,6 +100,7 @@ document.write(tmp+"<font color=red>X</font></span>");
 <hr/>
 
 <h1>msg</h1>
+可以用来代替alert使用
 <pre>
 /**
 *@param string text           显示的内容
@@ -108,8 +109,8 @@ document.write(tmp+"<font color=red>X</font></span>");
 */
 <font color=blue>jw.msg(text,time,callBackFn)</font>
 </pre>
-<p><input type="button" onclick="jw.msg('你好'+Math.random());" value="默认显示提示信息"></p>
-<p><input type="button" onclick="jw.msg('你好,这个停留显示5秒,隐藏时弹出对话框',5000,function(){alert('5秒后')});" value="5秒回调"></p>
+<p><input type="button" onclick="jw.msg('你好'+Math.random());" value="默认显示提示信息，持续显示3秒"></p>
+<p><input type="button" onclick="jw.msg('你好,这个停留显示5秒,隐藏时弹出对话框',5000,function(){alert('5秒后')});" value="5秒后隐藏，并执行回调函数"></p>
 <hr/>
 
 <h1>drag</h1>
@@ -161,5 +162,31 @@ jw.position_fixed("#fixed01");<br/>
 <script>
 jw.position_fixed("#fixed01");
 </script>
+<hr/>
+
+<h1>tab选项卡</h1>
+<pre>
+<font color=blue>jw.tab(headItems, contentItems,fn)</font>
+</pre>
+
+<div id="tab01">
+   <div class="hd"><ul><li><a>第一</a></li><li><a>第二</a></li></ul></div>
+   <div class='bd'>
+      <div>第一个选项卡的内容</div>
+      <div>第二个选项卡的内容</div>
+  </div>
+</div>
+<script>
+jw.tab("#tab01 .hd li","#tab01 .bd>div");
+</script> 
+<style>
+#tab01 {border: 1px solid #CCCCCC;margin-bottom: 10px;width:400px;height:200px}
+#tab01 .hd{height:28px;line-height: 28px; padding-right: 12px; text-align: right;background:#ccc}
+#tab01 .hd ul{margin:0;padding:0}
+#tab01 .hd li {float: left;height: 27px;line-height: 27px;padding: 0 20px;list-style:none;cursor: pointer;}
+#tab01 .hd li.cur { background-color: #FFFFFF;font-weight: bold;border-bottom:1px solid #fff}
+#tab01 .bd{padding:10px;}
+</style>
+
 </body>
 </html>
