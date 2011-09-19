@@ -4,18 +4,18 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "20110917 1.0",
+	version: "20110919 1.0",
     
     //tab 选项卡
     tab:function(headItems, contentItems,fn) {
 		var C = $(headItems), B = $(contentItems);
 		C.click(function(e) {
 			var i = C.index(this);
+			if(fn && $.isFunction(fn)){
+				if(fn.call(this,i,e)===false)return false;
+			}
 			C.removeClass("cur");
 			$(this).addClass("cur");
-			if(fn && $.isFunction(fn)){
-				if(fn(i,this,e)===false)return false;
-			}
 			B.hide().eq(i).show();
 		});
 		if(C.filter('.cur').size()<1)C.eq(0).addClass("cur");
@@ -25,7 +25,7 @@
 	//笼罩层
 	over:function(opt){
 		opt=opt||'show';
-		var over,wh=$(window).height(),bh=$('body').height();
+		var over,bh=$('body').height();
 		if(opt=='show'){
 			if($('.jw-over').length)return;
 			over=$('<div class="jw-over" ></div>');
@@ -149,6 +149,8 @@
 			     drag:true,
 			     over:true,
 			     fixed:true,
+			     id:null,
+			     html:null,
 			     title:'',
 			     iframeScroll:true,
 			     iframeFetchTitle:true,
@@ -184,9 +186,12 @@
      	        setSize(option.width,option.height);
 	         },0);
 	        if(option.id){
-    	        	bd.append(option.id);
+    	        	bd.append($(option.id).clone(true).show());
     	        	autoBounds();
-	         }
+	         }else if(option.html!=null){
+	        	 bd.append(option.html);
+	        	 autoBounds();
+	          }
 	       
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
@@ -313,10 +318,10 @@
 		               }else{
 		            	   autoBounds();
 		               }
-		               option.onLoad();
+		               option.onLoad.call(this);
 		         	});
 	         }else{
-	        	 option.onLoad();
+	        	 option.onLoad.call(this);
 	         }
 	         
 	         //没有遮罩层时，可能会有有多个dialog
@@ -397,22 +402,22 @@
 	    		          onCancle:function(){},
 	    		          title:'提示'
 	    		          },option||{});
-    	var ico=(option.icon+"").split("x");
-    	var x=ico[0],y=ico.length==2?ico[1]:1;
-    	var id="jwalert"+new Date().getTime();
-    	var style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;";
-    	var code="<div class='jw-alert'>" +
+    	var ico=(option.icon+"").split("x"),
+    	    x=ico[0],y=ico.length==2?ico[1]:1;
+    	    id="jwalert"+new Date().getTime(),
+    	    style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;",
+    	    code="<div class='jw-alert'>" +
 	    			"<div class='icon' style='"+style+"'></div><div class='bd'>"+(text||'')+"</div><div style='clear:both'></div>" +
 	    			"<div class='ft'>" +
 	    			"<input type='button' value='&nbsp;"+option.ok+"&nbsp;' id='"+id+"_ok' />";
-			if(option.cancle!=null){
-				code+="&nbsp;&nbsp;<input type='button' value='&nbsp;"+option.cancle+"&nbsp;' id='"+id+"_cannel' />";
-			}
-	    	code+="</div></div>";
-    	var div=$(code);
+		if(option.cancle!=null){
+			code+="&nbsp;&nbsp;<input type='button' value='&nbsp;"+option.cancle+"&nbsp;' id='"+id+"_cannel' />";
+		}
+    	code+="</div></div>";
     	style=x=ico=null;
-    	var ja=null;
-    	var timer=null;
+    	var div=$(code),
+    	    ja=null,
+    	    timer=null;
     	function call_bk(fn){if(fn()===false)return;ja.close();};
     	$('#'+id+"_ok",div).click(function(){timer && clearTimeout(timer);call_bk(option.onOk);});
     	$('#'+id+"_cannel",div).click(function(){call_bk(option.onCancle);});
