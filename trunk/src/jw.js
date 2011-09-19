@@ -152,6 +152,8 @@
 			     iframeFetchTitle:true,
 			     zIndex:301,
 			     onLoad:function(){},
+			     onClose:function(){},
+			     onMax:function(){},
 			     target:window
 			},op);
 	    	 var win=option.target,
@@ -202,11 +204,11 @@
 	        	autoBounds(width,height);
 	        };
 	        function scrollPos(){
+	        	  isFixed=dialog.css('position')=='fixed';
 	        	  return {top:isFixed?0:$(win).scrollTop(),left:isFixed?0:$(win).scrollLeft()};
 	          }
 	        
 	          function autoBounds(_w,_h){
-	        	    isFixed=dialog.css('position')=='fixed';
 	        	   var h=Math.min(Math.max(_h||0,option.height,140),wh-5-th);
 	     		   var w=Math.min(Math.max(_w||0,dialog.width(),option.width,300,bd.width()),ww);
 		          var top=0.75*(wh-h)/2+scrollPos().top,
@@ -235,7 +237,7 @@
 	          function close(e){
 	        	     if(e)e.stopPropagation();
 	          	     that.over('close');
-	          	     if( $.isFunction(option.onClose) && false===option.onClose()){
+	          	     if(false===option.onClose()){
 	          	    	 return false; 
 	          	      };
 	          	     dialog.animate({top:wh/2+scrollPos().top,left:ww/2,width:0,height:0},function(){
@@ -253,12 +255,14 @@
 	        		   setBounds(last.top,last.left,last.width,last.height);
 	        	   }else{
 	        		   isMax=true;
+	        		   var t=scrollPos().top;
 		        	   last={top:dialog.offset().top-(isFixed?$(win).scrollTop():0),left:dialog.offset().left,width:dialog.width(),height:bd.height()};
-		        	   setBounds(scrollPos().top,scrollPos().left,ww,wh-th);
+		        	   setBounds(t,scrollPos().left,ww,wh-th);
+		        	   t=null;
 	        	   }
 	        	   var _max=header.find('.max');
 	        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
-	        	   typeof option.onMax=='function' && option.onMax();
+	        	   option.onMax();
 	            }
 	          
 	         function toCenter(w,h){
