@@ -1,13 +1,39 @@
 <html>
 <head>
-<script src="../../demo/jquery-1.6.2.js"></script>
+<title>dq 表单助手</title>
+<script src="../../demo/jquery-1.6.4.js"></script>
 <script src="dq.js"></script>
+<script src="http://malsup.com/jquery/form/jquery.form.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="dq.css" />
-</head>
-<body>
-<div id="load"></div>
+<style>
+.demo,p{border:1px dashed gray;margin:10px;padding:10px}
+</style>
 <script>
-dq.ajaxLoading("#load");
+$(function(){
+    $('p,.demo').each(function(){
+        $(this).append("<br/>"+$(this).html().trim().replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>").replace(/\s/g,"&nbsp;"));
+    });
+})
 </script>
+</head>
+
+<body>
+<div class="demo">
+<div id="load"></div>
+<script>dq.loading("#load");</script>
+</div>
+
+<hr/>
+<h1>form</h1>
+<div>jquery form 插件 http://malsup.com/jquery/form</div>
+<div class="demo">
+<form id="form1" action="target1.htm"><input type="submit" value="ajax查询列表：将内容显示在指定区域"></form>
+<div id="ret1"></div>
+<script>dq.form('#form1',"#ret1",function(){
+	
+},{before:function(){
+	alert($(this).html())
+}});</script>
+</div>
 </body>
 </html>

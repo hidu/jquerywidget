@@ -3,15 +3,6 @@
 * $.form.js   http://malsup.com/$/form/
 * $.validate.js  http://bassistance.de/$-plugins/$-plugin-validation/
 * 主要是一些常用的ajax 相关的操作。
-* 20100715  修正了loadPager 当没有target时分页不能使用的问题
-* 20100803  修正ajaxsubmit dq header 过大的问题
-* 20101208  dialog  添加了close 事件
-* 20101231  ajax load 给内容添加close事件支持
-*20110407  loadHref判断链接是否存在
-*20110419    ajaxFile支持file标签 多文件选择
-*20110826 ajaxSubmit 添加表单注册延时参数 delay
-*20110829  移除dialog
-*20110901  loadPager 聚焦到目标
 * @copyright duwei
 * @author duwei<duv123@gmail.com>
  */
@@ -20,12 +11,12 @@
   if(window.dq.version)return;
   
   window.dq={
-		 version:'20110902',
+		 version:'20110919',
       /**
        *版本号
        */
        toString:function(){
-           return "DuWei Ajax util "+this.version;
+           return "duwei form kit "+this.version;
        },
        /**
        *在ajax load 数据的时候，使用该方法将目标显示正在装载的动画效果
@@ -33,18 +24,9 @@
        *@param target string ajax 装载目标
        */
        loading:function(target){
-         var t=$(target);
-         var h=t.height();
+         var t=$(target),h=t.height();
          if(h<70){h=80;}else if(h>500){h=300;}
-         var i=0,nbsp='&nbsp;&nbsp;&nbsp;&nbsp;';
-         if(!this.loading_nbsp){
-             while(i<3){
-               nbsp+=nbsp;
-               i++;
-             }
-             this.loading_nbsp=nbsp;
-         }
-          t.empty().html("<div class='dq_loding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<br/><span class='dq_loadingImg'>"+this.loading_nbsp+"</span></div>");
+          t.empty().html("<div class='dq_loding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<div class='dq_loadingImg'>&nbsp;</div></div>");
         },
     /**
      *@exmaple 1  使用Ajax进行表单查询  将查询内容显示在 dic#ret 中
@@ -85,7 +67,7 @@
      *@param ext.validateRule object $.Validate 的验证规则
      *@param ext.beforeFn function  发送请求前的自定义回调函数 返回 false 将终止动作
      */
-    ajaxSubmit:function(formID,targetID,sucFn,ext){
+    form:function(formID,targetID,sucFn,ext){
         if($.isFunction(targetID)){
 	        	ext=sucFn;
 	        	sucFn=targetID;
@@ -96,19 +78,22 @@
         	sucFn='';
            }
         
-        ext=ext||{reload:false,delay:0};
+        ext=$.extend({},{
+        	             dataType:null,
+        	             delay:0,
+        	             validate:true,
+        	             timeout:30000,
+        	             validateOpt:{},
+        	             before:null
+         },ext||{});
          
         var that=this,
             form=$(formID),
-            resetBt=form.find(':reset'),
-            submitEnable=function(enable){
-               form.find(':submit').attr('disabled',enable?false:true);
-            };
-         resetBt.click(function(){
-             var title=$(this).attr('title');
-              if(title.length && false===confirm(title)){
-                  return false;
-              }
+            submitEnable=function(enable){ form.find(':submit').attr('disabled',!enable);};
+            
+            form.find(':reset').click(function(){
+              var title=$(this).attr('title');
+              if(title.length && false===confirm(title))return false;
               submitEnable(true);
               form.resetForm();
               //触发自定义的reset事件 这样我们可以为表单的一些组合控件自定义reset 事件
@@ -122,76 +107,40 @@
         
         //before ajax submit function
         var showRequest=function(formData, jqForm, options) {
-            if($.isFunction(ext.beforeFn)){
-            	  if(ext.dataType === undefined)ext.dataType='json';
-            	  if(false===ext.beforeFn(jqForm)){
-                   return false;
-            	  }
-              }
+        	if(ext.before){
+	        	  if(ext.dataType ==null)ext.dataType='json';
+	        	  if(false===ext.before.call(jqForm))return false;
+        	}
             submitEnable(false);
-            var qstring = $.param(formData);
-            if(targetID){
-                 that.loading(targetID);
-                 if(ext.reload){
-		               $(targetID).attr('rel',options.url+'?'+qstring).unbind('reload').bind('reload',function(){
-		                      that.loading(targetID);
-		                      $(this).load($(this).attr('rel'));
-		                      return;
-		                  });
-                 }
-            }
+            targetID && that.loading(targetID);
             
         };//end showRequest
-        
-        //自定义ajax 出错提示信息
-        var errorFn=function(a,b,c){
-            targetID && $(targetID).html('load failed '+a.responseText);       
-            submitEnable(true);
-        };
         
       
         var options={
                 target:targetID,
                 beforeSubmit:showRequest,
-                timeout:ext.timeout||30000,
-                dataType:ext.dataType||null,
+                timeout:ext.timeout,
+                dataType:ext.dataType,
                 success:function(data){
-                    $.isFunction(sucFn) && sucFn(data);
-                    submitEnable(true);
+                	   submitEnable(true);
+                    $.isFunction(sucFn) && sucFn.call(form,data);
                 },
                 beforeSend:function(xml){
   				  try{
   				    xml.setRequestHeader("dq",window.screen.height+"/"+window.screen.width);
   				   }catch(e){}
   				},
-                error:errorFn
+                error:function(a,b,c){
+                    submitEnable(true);
+                    targetID && $(targetID).html('load failed '+a.responseText);       
+                }
          };
          function _reg_form(){
 	         if(ext.validate !== false && $.validator){ //使用 $.validator 进行表单验证
 	             var validateOpt={submitHandler: function() {form.ajaxSubmit(options);}};
-	             ext.validateOpt  && $.extend(validateOpt, ext.validateOpt);
-	             ext.validateRule && $.extend(validateOpt,{rules:ext.validateRule});
-	             if(ext.errorToTip){
-	                   /**
-	                 *jquery.validate 验证后错误信息显示位置设置函数，
-	                    *在ajaxSubmit 中若该默认的不能满足需求可以用户自定义
-	                    */
-	                   var   validateErrorPlace=function(error, element){
-	                         var nextTip=element.next('span.tip');
-	                         var tip=element.parents("td").find('span.tip');
-	                         var tipsize=tip.size();
-	                         if(nextTip.size()){
-	                             error.appendTo(nextTip);
-	                         }else if(tipsize){
-	                                  error.appendTo(tip.eq(tipsize-1));
-	                          }else{
-	                                 error.insertAfter(element);
-	                          }
-	                     };//end validateErrorPlace
-	                 var fn= (ext.validateErrorPlace && $.isFunction(ext.validateErrorPlace))?ext.validateErrorPlace:validateErrorPlace;
-	                 $.extend(validateOpt,{errorPlacement: fn});
-	              }
-	               form.validate(validateOpt);
+	             $.extend(validateOpt, ext.validateOpt);
+	             form.validate(validateOpt);
 	         }else{
 	             form.submit(function(){
 	                    $(this).ajaxSubmit(options);
@@ -220,16 +169,13 @@
      */
     loadHref:function(selector,targetID,relAttrName){
          var that=this,target=$(targetID);
-        $(selector).click(function(){
+         if(!target.size())return false;
+        $(selector).live('click',function(){
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
              that.centerIt(target);
              that.loading(targetID);
-             target.attr('rel',rel).load(rel).unbind('reload').bind('reload',function(e){
-                  that.loading(targetID);
-                  $(this).load($(this).attr('rel'));
-                  return false;
-             });
+             target.attr('rel',rel).load(rel);
            return false;
        });
     },
@@ -261,27 +207,7 @@
     *@param targetID string  ajax 分页显示装载的目标
     */
     loadPager:function(pagerID,targetID){
-        var  pager=$(pagerID||'.dq_pager'),
-             target=$(targetID||'#ret'),
-             that=this;
-         if(!target.size())return false;
-        pager.find("a").click(function(){
-        	try{
-        		that.centerIt(target);
-              that.loading(target);
-              var rel=$(this).attr('href');
-              target.attr('rel',rel).load(rel);
-        	}catch(e){}
-              return false;
-       });
-
-        //给容器 绑定自定义事件 reload
-        !target.attr('rel') && target.attr('rel',$('li.current',pager).attr('rel'));
-        target.unbind('reload').bind('reload',function(){
-             that.loading(target);
-             $(this).load($(this).attr('rel'));
-        });
-               
+       this.loadHref($(pagerID||'.dq_pager').find('a'),targetID);
     },
     /**
      * 将指定控件至于屏幕中间
@@ -362,11 +288,7 @@
        $("a["+attr+"]").live('click',function(){
            var t=$($(this).attr(attr));
            that.loading(t);
-           t.data('url',this.href).load(this.href).unbind('reload').bind('reload',function(){
-               that.loading(t);
-               t.load(t.data('url'));
-               return false;
-            });
+           t.data('url',this.href).load(this.href);
           return false;
        });
     },
@@ -394,7 +316,7 @@
         	var isOk=$.inArray(ext,option.fileExt)>-1;
         	if(!isOk) alert("文件:\n"+f+"\n不被支持！\n请选择后缀为"+option.fileExt.join()+"的文件");
         	return isOk;
-         }
+         };
         var  form=$(formID),
            file=form.find(':file'),
            fobj=file[0],
@@ -427,14 +349,14 @@
                   return false;
                   }
                  if(false===checkFileExt())return false;
-                 if((typeof beforeFn=="function") && false===beforeFn(jqForm)){
+                 if((typeof beforeFn=="function") && false===beforeFn.call(jqForm)){
                         return false;
                 }
            },//endBeforeSubmit
           dataType:option.dataType||"json",
           success:function(data){
              if(typeof sucFn=="function"){
-                 sucFn(data,form);
+                 sucFn.call(form,data);
              }
             },
           error:function(xhr, textStatus, errorThrown){
@@ -448,7 +370,7 @@
     },
 
     optionToSelect:function(value,text,select){
-        jQuery('<option value="'+value+'">'+text+'</option>').appendTo(select);
+        $('<option value="'+value+'">'+text+'</option>').appendTo(select);
    },
    /**
     * 级联控件
