@@ -37,6 +37,8 @@ $(function(){
           drag:true,            //是否支持拖动  
           over:true,            //是否显示遮罩层
           fixed:true,           //窗口位置是否固定
+          id:null,              //将指定id的内容作为body
+          html:null,            //使用此html代码作为body
           title:'',             //窗口标题
           rel:null,             //ajax加载窗体的地址 
           iframe:null,          //使用iframe的地址 
@@ -57,6 +59,13 @@ $(function(){
 <p><input type="button" onclick="jw.dialog({iframe:'iframe.html',title:'我的标题',iframeFetchTitle:false});" value="iframe 同域名,不使用iframe的title"></p>
 <p><button onclick="jw.dialog({rel:'_load.html'});return false;">ajax加载内容</button></p>
 <p><input type="button" onclick="jw.dialog({iframe:'iframe.html',target:window.top});" value="iframe 同域名的最上层窗口创建"></p>
+<div class="demo">
+	<input type="button" onclick="jw.dialog({id:'#dialog001'});" value="将隐藏的区块作为内容">
+	<div id="dialog001" style="display:none">这块是隐藏的内容！</div>
+</div>
+<div class="demo">
+	<input type="button" onclick="jw.dialog({html:'你好阿<div id=dialog_b></div>',onLoad:function(){$('#dialog_b').html('onload事件触发');}});" value="指定body的html">
+</div>
 <hr/>
 
 <h1>alert</h1>
@@ -184,17 +193,16 @@ jw.position_fixed("#drag002");
 
 <div class="demo">
 <div id="tab01" class='jw-tab'>
-   <div class="hd"><ul><li><a>第一</a></li><li><a>第二</a></li></ul></div>
+   <div class="hd"><ul><li><a>第一</a></li><li><a>第二</a></li><li><a>第三</a></li></ul></div>
    <div class='bd'>
       <div>第一个选项卡的内容</div>
       <div>第二个选项卡的内容</div>
   </div>
 </div>
 <script>
-jw.tab("#tab01 .hd li","#tab01 .bd>div");
+jw.tab("#tab01 .hd li","#tab01 .bd>div",function(i,e){ if(i==2){alert($(this).text());return false;}});
 </script> 
 </div>
-
 
 </body>
 </html>
