@@ -167,7 +167,7 @@
 	        _style=null;
 	        dialog=$(win.document.body).append(dialog).find("#"+_id);
 	        option.over && this.over();
-	        
+	        option.fixed && this.position_fixed(dialog,win);
 	        var bd=$('.jw-dialog-bd',dialog),
 	            hd=$('.jw-dialog-hd',dialog),
 	            isMax=false,
@@ -332,7 +332,7 @@
 	        
 	        var fn=function(){autoBounds();dialog.is(":visible")&&that.over();};
 	        $(win).resize(fn);
-	        option.fixed && this.position_fixed(dialog,win);
+	        
 	        dialog.bind('close',close).find('.close').live('click mousedown',close).end().find('.max').live('click mousedown',max);
 	        if(option.close!==false){
 	        	$(win).keydown(function(e){
