@@ -4,7 +4,7 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "20110919 1.0",
+	version: "20110920 1.0",
     
     //tab 选项卡
     tab:function(headItems, contentItems,fn) {
@@ -192,7 +192,6 @@
 	        	 bd.append(option.html);
 	        	 autoBounds();
 	          }
-	       
 	        if(option.title!==false){
 	        	   var _div="<span><a href='javascript:;' ";
 	              header="<table width='100%'><tr><td>"+
@@ -201,6 +200,9 @@
 	             option.close!=false && (header+=_div+" class='close'>X&nbsp;</a></span>");
 	             header+="</nobr></td></tr></table>";
 	             header=hd.append(header).find('table');
+	         }else{
+	        	 hd.remove();
+	        	 th=0;
 	         }
 	        function setTitle(title){
 	        	 option.title!==false && header.find('.jw-title').text(title);
