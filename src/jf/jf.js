@@ -7,16 +7,16 @@
 * @author duwei<duv123@gmail.com>
  */
 ;(function($){
-  window.dq=window.dq||{};
-  if(window.dq.version)return;
+  window.jf=window.jf||{};
+  if(window.jf.version)return;
   
-  window.dq={
+  window.jf={
 		 version:'20110919',
       /**
        *版本号
        */
        toString:function(){
-           return "duwei form kit "+this.version;
+           return "form kit "+this.version;
        },
        /**
        *在ajax load 数据的时候，使用该方法将目标显示正在装载的动画效果
@@ -167,10 +167,10 @@
      * @param hrefSelecter 链接选择器
      * @param targetID  显示目标ID
      */
-    loadHref:function(selector,targetID,relAttrName){
+    loadHref:function(linkSelector,targetID,relAttrName){
          var that=this,target=$(targetID);
          if(!target.size())return false;
-        $(selector).live('click',function(){
+        $(linkSelector).live('click',function(){
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
              that.centerIt(target);
@@ -206,7 +206,7 @@
     *@param pagerID string 分页链接所在的div层的选择器
     *@param targetID string  ajax 分页显示装载的目标
     */
-    loadPager:function(pagerID,targetID){
+    pager:function(pagerID,targetID){
        this.loadHref($(pagerID||'.dq_pager').find('a'),targetID);
     },
     /**
@@ -375,24 +375,35 @@
    /**
     * 级联控件
     */
-    relation:function(m,n,allValue,ctxt){
-  	  m=jQuery(m);
-  	  var t=jQuery(n),that=this;
-  	  m.change(function(){
-  		  var v=jQuery(this).val(),
+    relation:function(first,second,values,ctxt){
+  	  var t=$(second),that=this;
+  	  $(first).change(function(){
+  		  var v=$(this).val(),
   		     _v=t.find('option:selected').val(),
-  		     nextAll=allValue?(allValue[v]||''):'';
-  		  t.empty();
-  		  ctxt && that.optionToSelect('',ctxt,t);
-  		  jQuery.each(nextAll,function(i,txt){
-  			  that.optionToSelect(i,txt,t);
-  			});
-  		  if(_v && nextAll[_v]){
-  			  t.val(_v);
-  		  } 
-  		  t.change();
+  		     nextAll='';
+  		     if(values && (typeof values)=='string'){
+  		    	 $.getJSON(values+v,function(data){
+  		    		nextAll=data;
+  		    		fill();
+  		    	 });
+  		     }else{
+  		       nextAll=values?(values[v]||''):'';
+  		       fill();
+  		     }
+  		 function fill(){
+	  		  t.empty();
+	  		  ctxt && that.optionToSelect('',ctxt,t);
+	  		  $.each(nextAll,function(i,txt){
+	  			  that.optionToSelect(i,txt,t);
+	  			});
+	  		  if(_v && nextAll[_v]){
+	  			  t.val(_v);
+	  		  } 
+	  		  t.change();
+  		 }
   	  }).change();
     },
+    
     
     findByName:function(name,doc){
     	return jQuery(document.getElementsByName(name),doc||"*").map(function(index, element) {
