@@ -10,24 +10,31 @@
 .demo,p{border:1px dashed gray;margin:10px;padding:10px}
 </style>
 </head>
-
 <body>
+
+<!-- 
 <div class="demo">
 <div id="load"></div>
 <script>jf.loading("#load");</script>
 </div>
-
 <hr/>
+ -->
+ 
 <h1>form</h1>
 <div>jquery form 插件 http://malsup.com/jquery/form</div>
+<h5>ajax查询列表：将内容显示在指定区域</h5>
 <div class="demo">
-<form id="form1" action="target1.htm"><input type="submit" value="ajax查询列表：将内容显示在指定区域"></form>
+<form id="form1" action="_res/form1.php">请输入：<input type="text" name='id'><input type="submit" value="查询"></form>
 <div id="ret1"></div>
-<script>jf.form('#form1',"#ret1",function(){
-	
-},{before:function(){
-	alert($(this).html())
-}});</script>
+<script>jf.form('#form1',"#ret1");</script>
+</div>
+
+<h5>ajax提交表单</h5>
+<div class="demo">
+<form id="form2" action="_res/form2.php" method="post">请输入：<input type="text" name='id'><input type="submit" value="提交"></form>
+<script>jf.form('#form2',function(d){
+	alert(d.msg+"\n当前时间"+d.time);
+},{dataType:'json'});</script>
 </div>
 <hr/>
 
@@ -54,7 +61,7 @@ $(function(){
 <select id='fourth'><option selected="selected">请选择</option><option value='1'>1</option><option value='2'>2</option></select>
 <select id='fifth'></select>
 <script>
-jf.relation("#fourth",'#fifth','getRelationData.php?id=',"请选择");
+jf.relation("#fourth",'#fifth','_res/getRelationData.php?id=',"请选择");
 </script>
 </div>
 
