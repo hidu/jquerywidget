@@ -1,0 +1,62 @@
+<html>
+<head>
+<title>jquery 表单助手</title>
+<script src="../../demo/jquery-1.6.4.js"></script>
+<script src="jf.js"></script>
+<script src="../../demo/demo.js"></script>
+<script src="http://malsup.com/jquery/form/jquery.form.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="jf.css" />
+<style>
+.demo,p{border:1px dashed gray;margin:10px;padding:10px}
+</style>
+</head>
+
+<body>
+<div class="demo">
+<div id="load"></div>
+<script>jf.loading("#load");</script>
+</div>
+
+<hr/>
+<h1>form</h1>
+<div>jquery form 插件 http://malsup.com/jquery/form</div>
+<div class="demo">
+<form id="form1" action="target1.htm"><input type="submit" value="ajax查询列表：将内容显示在指定区域"></form>
+<div id="ret1"></div>
+<script>jf.form('#form1',"#ret1",function(){
+	
+},{before:function(){
+	alert($(this).html())
+}});</script>
+</div>
+<hr/>
+
+<h1>relation 级联</h1>
+可以实现无限级联
+<h5>普通的级联（已知道所有数据）</h5>
+<div class="demo">
+<select id='first'><option selected="selected">请选择</option><option value='1'>1</option><option value='2'>2</option></select>
+<select id='second'></select>
+<select id='third'></select>
+<script>
+$(function(){
+	var values={1:{11:"a",12:'b'},2:{21:'c',22:'d'}};
+	jf.relation("#first",'#second',values,"请选择");
+	
+	var values1={11:{111:"a1",112:'b1'},12:{121:'b1',122:'b2'},21:{211:'c1',212:'c2'},22:{221:'d1',222:'d2'}};
+	jf.relation("#second",'#third',values1,"请选择");
+});
+</script>
+</div>
+
+<h5>ajax获取二级数据</h5>
+<div class="demo">
+<select id='fourth'><option selected="selected">请选择</option><option value='1'>1</option><option value='2'>2</option></select>
+<select id='fifth'></select>
+<script>
+jf.relation("#fourth",'#fifth','getRelationData.php?id=',"请选择");
+</script>
+</div>
+
+</body>
+</html>

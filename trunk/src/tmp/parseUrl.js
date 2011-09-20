@@ -1,5 +1,4 @@
-//url 地址解析
-	parseUrl:function(url){
+function parseUrl(url){
 		 //若是ie浏览器，相对地址 如 jquery/widget.html 并不能正常识别
 		 if($.browser.msie){
 			 var b=/^[A-Za-z]+:/;
@@ -22,4 +21,4 @@
 		 result['query']=result['search'].replace(/^\?/,'');
 		 a=names=null;
 		 return result;
-    },
+   }
