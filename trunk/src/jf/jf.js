@@ -20,13 +20,12 @@
        },
        /**
        *在ajax load 数据的时候，使用该方法将目标显示正在装载的动画效果
-       * 需要在样式表中设置 .loadingImg 
        *@param target string ajax 装载目标
        */
        loading:function(target){
          var t=$(target),h=t.height();
          if(h<70){h=80;}else if(h>500){h=300;}
-          t.empty().html("<div class='jf_loding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<div class='jf_loadingImg'>&nbsp;</div></div>");
+          t.empty().html("<div class='jf_loading' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<div>&nbsp;</div></div>");
         },
     /**
      *@exmaple 1  使用Ajax进行表单查询  将查询内容显示在 dic#ret 中
@@ -36,7 +35,7 @@
        </form>
        <div id="ret"></div>
       <script>
-         dq.ajaxSubmit('#myform','#ret');
+         jf.form('#myform','#ret');
       </script>
      
      @example 2 使用ajax 提交表单【登陆】(json格式返回数据)
@@ -47,7 +46,7 @@
      </form>
      <script>
      //假设返回的数据为json格式  {status:1,info:'提示信息'} status=1 表示状态为登陆成功
-      dq.ajaxSubmit("#loginform",'',function(d){
+      jf.form("#loginform",function(d){
          if(d.status==1){
              location.href="index.html";
          }else{
@@ -61,11 +60,10 @@
      * @param targetID  显示目标ID  eg: '#retDiv'
      * @param sucFn  成功后执行的函数
      * @param ext  其他参数
-     *@param ext.validate boolean 是否使用$.validate 插件进行表单验证
+     *@param ext.validate 是否使用$.validate 插件进行表单验证,设置为false不验证，为object时将其作为验证选项
      *@param ext.reload  boolean  当使用ajax 表单查询的时候，是否在现实位置添加[刷新列表]的 链接（ajax刷新当前页）
      *@param ext.delay  int  注册函数是否延时
-     *@param ext.validateRule object $.Validate 的验证规则
-     *@param ext.beforeFn function  发送请求前的自定义回调函数 返回 false 将终止动作
+     *@param ext.before function  发送请求前的自定义回调函数 返回 false 将终止动作
      */
     form:function(formID,targetID,sucFn,ext){
         if($.isFunction(targetID)){
@@ -182,27 +180,6 @@
     
     /**
     *
-    *
-    <div id="ret">
-        <div>你好这里是第1页显示的信息</div>
-        <div class="pager">
-            <a href="a.html?page=1">第1页</a>
-            <a href="a.html?page=2">第2页</a>
-            <a href="a.html?page=3">第3页</a>
-            <a href="a.html?page=4">第4页</a>
-            <select fn="page" onchange='location.href=page(this.value);'>
-               <option value="1">1</option>
-               <option value="2">2</option>
-            </select>
-        </div>
-    </div>
-    <script>
-     dq.loadPager();
-     function page(p){
-        return 'a.html?page='+p;
-     }
-    </script>
-
     *@param pagerID string 分页链接所在的div层的选择器
     *@param targetID string  ajax 分页显示装载的目标
     */

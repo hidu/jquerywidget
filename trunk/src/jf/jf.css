@@ -1,6 +1,6 @@
 
-.jf_loding{margin-left: 40%;display: inherit;}
-.jf_loadingImg{background-image: url(loading36.gif);display: inherit;width:128px;height:15px;}
+.jf_loading{margin-left: 40%;display: inherit;}
+.jf_loading div{background-image: url(loading36.gif);display: inherit;width:128px;height:15px;}
 
 table tr.jf_select{background: #CFE7FF;}
 
