@@ -46,13 +46,13 @@
 <font color=blue>jw.dialog(option);</font>
 
 </pre>
-<p><input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:450});" value="iframe 不同域名"></p>
-<p><input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:300,over:false});" value="iframe 没有遮罩层"></p>
+<p class="demo"><input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:450});" value="iframe 不同域名"></p>
+<p class="demo"><input type="button" onclick="jw.dialog({iframe:'http://www.baidu.com',width:800,height:300,over:false});" value="iframe 没有遮罩层"></p>
 
-<p><input type="button" onclick="jw.dialog({iframe:'iframe.html'});" value="iframe 同域名,自适应大小"></p>
-<p><input type="button" onclick="jw.dialog({iframe:'iframe.html',title:'我的标题',iframeFetchTitle:false});" value="iframe 同域名,不使用iframe的title"></p>
-<p><button onclick="jw.dialog({rel:'_load.html'});return false;">ajax加载内容</button></p>
-<p><input type="button" onclick="jw.dialog({iframe:'iframe.html',target:window.top});" value="iframe 同域名的最上层窗口创建"></p>
+<p class="demo"><input type="button" onclick="jw.dialog({iframe:'iframe.html'});" value="iframe 同域名,自适应大小"></p>
+<p class="demo"><input type="button" onclick="jw.dialog({iframe:'iframe.html',title:'我的标题',iframeFetchTitle:false});" value="iframe 同域名,不使用iframe的title"></p>
+<p class="demo"><button onclick="jw.dialog({rel:'_load.html'});return false;">ajax加载内容</button></p>
+<p class="demo"><input type="button" onclick="jw.dialog({iframe:'iframe.html',target:window.top});" value="iframe 同域名的最上层窗口创建"></p>
 <div class="demo">
 	<input type="button" onclick="jw.dialog({id:'#dialog001'});" value="将隐藏的区块作为内容">
 	<div id="dialog001" style="display:none">这块是隐藏的内容！</div>
@@ -79,15 +79,15 @@
 <font color=blue>jw.alert(text,option);</font>
 </pre>
 </div>
-<p><input type="button" onclick="jw.alert('这是一个alert!');" value="默认图标"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{icon:3});" value="指定图标1"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{icon:4});" value="指定图标2"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{icon:'4x2'});" value="指定图标3"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000});" value="alert 2'后关闭"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000,onOk:function(){alert('马上关闭')}});" value="alert 2'后关闭,并执行回调"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{onOk:function(){alert(1)}});" value="点击确定时回调"></p>
-<p><input type="button" onclick="jw.alert('这是一个alert!',{cancle:'取消',onCancle:function(){alert('cancle')}});" value="显示取消按钮"></p>
-<p><input type="button" onclick="jw.alert('<input type=text id=\'a\'>',{title:'请输入',cancle:'取消',onOk:function(){var a=$('#a').val();if(a==''){alert('请输入内容');return false;}alert(a)}});" value="显示HTML(模拟confirm)（回调返回false阻止关闭）"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!');" value="默认图标"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{icon:3});" value="指定图标1"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{icon:4});" value="指定图标2"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{icon:'4x2'});" value="指定图标3"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000});" value="alert 2'后关闭"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000,onOk:function(){alert('马上关闭')}});" value="alert 2'后关闭,并执行回调"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{onOk:function(){alert(1)}});" value="点击确定时回调"></p>
+<p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{cancle:'取消',onCancle:function(){alert('cancle')}});" value="显示取消按钮"></p>
+<p class="demo"><input type="button" onclick="jw.alert('<input type=text id=\'a\'>',{title:'请输入',cancle:'取消',onOk:function(){var a=$('#a').val();if(a==''){alert('请输入内容');return false;}alert(a)}});" value="显示HTML(模拟confirm)（回调返回false阻止关闭）"></p>
 <div>
 <div>以下是所有的图标,每个图标尺寸为width=50px,height=50px</div>
 jw.alert('这是一个alert!','<font color=red>13x2</font>')表示使用坐标 x=13,y=2 位置的图标
@@ -128,8 +128,8 @@ document.write(tmp+"<font color=red>X</font></span>");
 */
 <font color=blue>jw.msg(text,time,callBackFn)</font>
 </pre>
-<p><input type="button" onclick="jw.msg('你好'+Math.random());" value="默认显示提示信息，持续显示3秒"></p>
-<p><input type="button" onclick="jw.msg('你好,这个停留显示5秒,隐藏时弹出对话框',5000,function(){alert('5秒后')});" value="5秒后隐藏，并执行回调函数"></p>
+<p class="demo"><input type="button" onclick="jw.msg('你好'+Math.random());" value="默认显示提示信息，持续显示3秒"></p>
+<p class="demo"><input type="button" onclick="jw.msg('你好,这个停留显示5秒,隐藏时弹出对话框',5000,function(){alert('5秒后')});" value="5秒后隐藏，并执行回调函数"></p>
 <hr/>
 
 <h1>drag</h1>

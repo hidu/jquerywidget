@@ -5,7 +5,7 @@ var h='<link href="http://alexgorbatchev.com/pub/sh/current/styles/shCore.css" r
 document.write(h);
 document.write("<style>.syntaxhighlighter{overflow:hidden !important}</style>");
 $(function(){
-	  $('p,.demo').each(function(){
+	  $('.demo').each(function(){
 	      $(this).append("<br/><pre class='brush: html'>"+$(this).html().trim().replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>");
 	  });
 	  SyntaxHighlighter.defaults['toolbar'] = false;
