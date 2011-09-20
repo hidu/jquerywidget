@@ -165,11 +165,11 @@
      * @param hrefSelecter 链接选择器
      * @param targetID  显示目标ID
      */
-    loadHref:function(linkSelector,targetID,relAttrName){
+    ajaxLink:function(linkSelector,targetID){
          var that=this,target=$(targetID);
          if(!target.size())return false;
         $(linkSelector).die('click').live('click',function(){
-             var rel=$(this).attr(relAttrName||'href');
+             var rel=$(this).attr('href');
              if(!rel)return;
              that.centerIt(target);
              that.loading(targetID);
@@ -184,7 +184,7 @@
     *@param targetID string  ajax 分页显示装载的目标
     */
     pager:function(pagerID,targetID){
-       this.loadHref($(pagerID||'.pager').find('a'),targetID);
+       this.ajaxLink($(pagerID||'.pager').find('a'),targetID);
     },
     /**
      * 将指定控件至于屏幕中间
@@ -192,9 +192,7 @@
     centerIt:function(target){
     	var y=$(target).offset().top;
 		var h=$(window).height();
-		if(y>window.scrollY+0.75*h || y<window.scrollY){
-			window.scrollTo(window.scrollX,y-20);
-		}
+		if(y>window.scrollY+0.75*h || y<window.scrollY) window.scrollTo(window.scrollX,y-20);
     },
 
    /**
