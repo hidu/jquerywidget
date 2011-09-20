@@ -11,7 +11,7 @@
   if(window.jf.version)return;
   
   window.jf={
-		 version:'20110919',
+		 version:'20110920',
       /**
        *版本号
        */
@@ -26,7 +26,7 @@
        loading:function(target){
          var t=$(target),h=t.height();
          if(h<70){h=80;}else if(h>500){h=300;}
-          t.empty().html("<div class='dq_loding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<div class='dq_loadingImg'>&nbsp;</div></div>");
+          t.empty().html("<div class='jf_loding' style='height:"+h+"px;padding-top:"+(h-70)/2+"px;'>正在加载...<div class='jf_loadingImg'>&nbsp;</div></div>");
         },
     /**
      *@exmaple 1  使用Ajax进行表单查询  将查询内容显示在 dic#ret 中
@@ -83,7 +83,7 @@
         	             delay:0,
         	             validate:true,
         	             timeout:30000,
-        	             validateOpt:{},
+        	             validate:{},
         	             before:null
          },ext||{});
          
@@ -139,7 +139,7 @@
          function _reg_form(){
 	         if(ext.validate !== false && $.validator){ //使用 $.validator 进行表单验证
 	             var validateOpt={submitHandler: function() {form.ajaxSubmit(options);}};
-	             $.extend(validateOpt, ext.validateOpt);
+	             $.extend(validateOpt, ext.validate);
 	             form.validate(validateOpt);
 	         }else{
 	             form.submit(function(){
@@ -170,7 +170,7 @@
     loadHref:function(linkSelector,targetID,relAttrName){
          var that=this,target=$(targetID);
          if(!target.size())return false;
-        $(linkSelector).live('click',function(){
+        $(linkSelector).die('click').live('click',function(){
              var rel=$(this).attr(relAttrName||'href');
              if(!rel)return;
              that.centerIt(target);
@@ -207,7 +207,7 @@
     *@param targetID string  ajax 分页显示装载的目标
     */
     pager:function(pagerID,targetID){
-       this.loadHref($(pagerID||'.dq_pager').find('a'),targetID);
+       this.loadHref($(pagerID||'.pager').find('a'),targetID);
     },
     /**
      * 将指定控件至于屏幕中间
@@ -229,10 +229,10 @@
     3 <input type="checkbox" class="checkAll" name="aaa[]" value="3"/>
     4 <input type="checkbox" class="checkAll" name="aaa[]" value="4"/>
     
-     <a onclick="dq.checkAll('.checkAll',1)" href="javascript:;">全选</a>
-     <a onclick="dq.checkAll('.checkAll',0)" href="javascript:;">全不选</a> 
-     <a onclick="dq.checkAll('.checkAll',2)" href="javascript:;">反选</a>   
-     <a onclick="var ids=dq.checkAll('.checkAll',9);alert(ids.join(','))" href="javascript:;">当前选择项</a>   
+     <a onclick="jf.checkAll('.checkAll',1)" href="javascript:;">全选</a>
+     <a onclick="jf.checkAll('.checkAll',0)" href="javascript:;">全不选</a> 
+     <a onclick="jf.checkAll('.checkAll',2)" href="javascript:;">反选</a>   
+     <a onclick="var ids=jf.checkAll('.checkAll',9);alert(ids.join(','))" href="javascript:;">当前选择项</a>   
 
      *@param targetClass  checkBox 的选择器，一般使用指定的class
      *@param  type  选择类型  0:全不选，1:全选, 2:反选, 9:返回所有选择的值
@@ -267,32 +267,14 @@
      *@param table  String  选择器
      */
     trSelect:function(tableSelector){
-        var table=$(tableSelector||'.dqTable'),
+        var table=$(tableSelector||'table'),
             fn=function(){
-              table.find('tr').removeClass('dq_select');
-              $(this).parents('tr').addClass('dq_select');
+              table.find('tr').removeClass('jf_select');
+              $(this).parents('tr').addClass('jf_select');
           };
         table.find('tbody td *').bind('click',fn);
         table.find('tbody td').bind('dblclick',fn);
     },
-    
-   /**
-    *ajax 链接 
-    * 需要$ 1.3 版本
-       <a href="a.html" ajax="#ret">ajax测试</a>
-        <div id="ret">将a.html 显示在这里</div>
-    */
-    ajaxLink:function(attr){
-       attr=attr||'ajax';
-       var that=this;
-       $("a["+attr+"]").live('click',function(){
-           var t=$($(this).attr(attr));
-           that.loading(t);
-           t.data('url',this.href).load(this.href);
-          return false;
-       });
-    },
-    
 
     /**
      * ajax 上传文件
@@ -411,4 +393,5 @@
     	});
     }
 };
+  
 })(jQuery);
