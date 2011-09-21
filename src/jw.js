@@ -4,7 +4,7 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "20110920 1.0",
+	version: "20110921 1.0",
     
     //tab 选项卡
     tab:function(headItems, contentItems,fn) {
@@ -320,8 +320,8 @@
 					               if(it.length)setTitle(it);
 					              }
 				               setTimeout(function(){
-				            	    dialog.width(300);
-					               bd.height(100);
+				            	   !op.width && dialog.width(300);
+				            	   !op.height &&  bd.height(100);
 				            	    setSize(c.width(),c.height());
 				            	    },5);//use timeout to fix ie
 			               }else{
