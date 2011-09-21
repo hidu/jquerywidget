@@ -247,12 +247,12 @@
 	          function close(e){
 	        	     if(e)e.stopPropagation();
 	          	     that.over('close');
-	          	     if(false===option.onClose()){
-	          	    	 return false; 
-	          	      };
+	          	     if(0===option.onClose())return false;
+	          	    	 
 	          	     dialog.animate({top:wh/2+scrollPos().top,left:ww/2,width:0,height:0},function(){
 	          	    	dialog.remove();
 	          	     });
+	          	     return false; 
 	           }
 	         
 	           function max(e){
@@ -273,6 +273,7 @@
 	        	   var _max=header.find('.max');
 	        	   isMax?_max.addClass('maxed'):_max.removeClass('maxed');
 	        	   option.onMax();
+	        	   return false;
 	            }
 	          
 	         function toCenter(w,h){
@@ -281,11 +282,20 @@
 	        	 dialog.css({top:0.75*(wh-h)/2,left:(ww-w)/2,width:w,height:h+th});
 	      	     bd.height(h);
 	          }
+	         var dialogFn={close:close,
+	        		         setSize:setSize,
+	        		         setBounds:setBounds,
+	        		         setLocation:setLocation,
+	        		         setTitle:setTitle,
+	        		         setBody:function(html){bd.html(html)},
+	        		         dialog:dialog,
+	        		         bd:bd
+	                          };
 	         
 	         if(option.rel){
 	             bd.css('height','auto').empty().load(option.rel,function(){
 	            	 setTimeout(function(){ autoBounds(bd.width(),bd.height());},100);
-	            	 setTimeout(function(){option.onLoad();},150);
+	            	 setTimeout(function(){option.onLoad.call(dialogFn);},150);
 	            	});
 	         }else if(option.iframe){
 		        var ifr="<iframe class='jw-dialog-ifr iframe' src='"+option.iframe+"' style='width:100%;height:100%;border:0' frameborder=0 "+(option.iframeScroll?"":"scrolling=no")+" ></iframe>";
@@ -320,10 +330,10 @@
 		               }else{
 		            	   autoBounds();
 		               }
-		               option.onLoad.call(this);
+		               option.onLoad.call(dialogFn);
 		         	});
 	         }else{
-	        	 option.onLoad.call(this);
+	        	 option.onLoad.call(dialogFn);
 	         }
 	         
 	         //没有遮罩层时，可能会有有多个dialog
@@ -346,8 +356,8 @@
 	        		e.keyCode==27 && close();
 	        	});
 	        }
-	        option.drag && this.drag(header,dialog,win);
-	        return {close:close,setSize:setSize,setBounds:setBounds,setLocation:setLocation,setTitle:setTitle};
+	        option.drag && header && this.drag(header,dialog,win);
+	        return dialogFn;
 	    },
 	    
 	   //网页底部的提示信息 
@@ -423,7 +433,7 @@
     	function call_bk(fn){if(fn()===false)return;ja.close();};
     	$('#'+id+"_ok",div).click(function(){timer && clearTimeout(timer);call_bk(option.onOk);});
     	$('#'+id+"_cannel",div).click(function(){call_bk(option.onCancle);});
-    	ja=jw.dialog({id:div,max:false,close:false,title:option.title,fixed:true,width:350,over:false});
+    	ja=jw.dialog({id:div,max:false,close:false,title:option.title,fixed:true,width:350,over:true});
     	if(option.time)timer=setTimeout(function(){call_bk(option.onOk);},option.time);
       };
     $.extend(jw,{alert:jwalert}); 
