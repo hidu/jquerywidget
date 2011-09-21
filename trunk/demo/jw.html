@@ -59,7 +59,7 @@
 	<div id="dialog001" style="display:none">这块是隐藏的内容！</div>
 </div>
 <div class="demo">
-	<input type="button" onclick="jw.dialog({html:'你好阿<div id=dialog_b></div>',onLoad:function(){$('#dialog_b').html('onload事件触发');}});" value="指定body的html">
+	<input type="button" onclick="jw.dialog({html:'你好阿<div id=dialog_b></div>',onLoad:function(){$('#dialog_b',this.bd).html('onload事件触发');}});" value="指定body的html">
 </div>
 <hr/>
 
