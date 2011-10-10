@@ -14,6 +14,7 @@ $(function(){
 		  try{
 			  SyntaxHighlighter.defaults['toolbar'] = false;
 			  SyntaxHighlighter.defaults['gutter'] = false;
+			  SyntaxHighlighter.defaults['quick-code'] = false;
 			  SyntaxHighlighter.defaults['auto-links'] = false;
 			  SyntaxHighlighter.all();
 		  }catch(e){alert(e.message)}
