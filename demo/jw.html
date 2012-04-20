@@ -1,16 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>jw demo</title>
 <link rel="stylesheet" type="text/css" media="screen" href="../src/jw.css" />
 <style>
-.jw-tab {border: 1px solid #CCCCCC;margin-bottom: 10px;width:400px;height:200px}
-.jw-tab .hd{height:28px;line-height: 28px; padding-right: 12px; text-align: right;background:#ccc}
-.jw-tab .hd ul{margin:0;padding:0}
-.jw-tab .hd li {float: left;height: 27px;line-height: 27px;padding: 0 20px;list-style:none;cursor: pointer;}
-.jw-tab .hd li.cur { background-color: #FFFFFF;font-weight: bold;border-bottom:1px solid #fff}
-.jw-tab .bd{padding:10px;}
 
 .demo,p{border:1px dashed gray;margin:10px;padding:10px}
 </style>
@@ -88,7 +82,7 @@
 <p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{icon:'7',time:2000,onOk:function(){alert('马上关闭')}});" value="alert 2'后关闭,并执行回调"></p>
 <p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{onOk:function(){alert(1)}});" value="点击确定时回调"></p>
 <p class="demo"><input type="button" onclick="jw.alert('这是一个alert!',{cancle:'取消',onCancle:function(){alert('cancle')}});" value="显示取消按钮"></p>
-<p class="demo"><input type="button" onclick="jw.alert('<input type=text id=\'a\'>',{title:'请输入',cancle:'取消',onOk:function(){var a=$('#a').val();if(a==''){alert('请输入内容');return false;}alert(a)}});" value="显示HTML(模拟confirm)（回调返回false阻止关闭）"></p>
+<p class="demo"><input type="button" onclick="jw.alert('<input type=text id=\'a\'>',{title:'请输入',cancle:'取消',onOk:function(){var a=$('#a').val();if(a==''){alert('请输入内容');return false;}alert(a)}});" value="显示HTML(模拟prompt)（回调返回false阻止关闭）"></p>
 <div>
 <div>以下是所有的图标,每个图标尺寸为width=50px,height=50px</div>
 jw.alert('这是一个alert!','<font color=red>13x2</font>')表示使用坐标 x=13,y=2 位置的图标
@@ -197,6 +191,25 @@ jw.position_fixed("#drag002");
 <script>
 jw.tab("#tab01 .hd li","#tab01 .bd>div",function(i,e){ if(i==2){alert($(this).text());return false;}});
 </script> 
+</div>
+
+<div class="demo">
+<input type="button" value="test" onclick="test_pbar()">
+<div id="process-bar"></div>
+<script>
+var b=jw.processbar("#process-bar",10);
+function test_pbar(){
+	b.val(10);
+	function a(){
+		setTimeout(function(){
+	      var v=b.val();
+			b.val(v+1);
+			if(v<100)a();
+		},100);
+	}
+	a();
+}
+</script>
 </div>
 
 </body>

@@ -11,7 +11,7 @@
   if(window.jf.version)return;
   
   window.jf={
-		 version:'20110920',
+		 version:'20120421',
       /**
        *版本号
        */
@@ -126,7 +126,7 @@
                 },
                 beforeSend:function(xml){
   				  try{
-  				    xml.setRequestHeader("dq",window.screen.height+"/"+window.screen.width);
+  				    xml.setRequestHeader("jf",window.screen.height+"/"+window.screen.width);
   				   }catch(e){}
   				},
                 error:function(a,b,c){
@@ -160,7 +160,7 @@
 
     /**
      * 阻止ajax表单返回的html页面中的链接直接跳转到其他页面，主要用于分页的链接，让链接地址在目标targetID内显示。
-     * eg:jq.Pojaa.loadHref('.pager a','#retDiv')
+     * eg:jf.loadHref('.pager a','#retDiv')
      * 该函数需要和链接在同一个页面中声明.
      * @param hrefSelecter 链接选择器
      * @param targetID  显示目标ID
@@ -330,7 +330,16 @@
         $('<option value="'+value+'">'+text+'</option>').appendTo(select);
    },
    /**
+    *    
+    var values={1:{11:"a",12:'b'},2:{21:'c',22:'d'}};
+    jf.relation("#first",'#second',values,"请选择");
+    var values1={11:{111:"a1",112:'b1'},12:{121:'b1',122:'b2'},21:{211:'c1',212:'c2'},22:{221:'d1',222:'d2'}};
+    jf.relation("#second",'#third',values1,"请选择");
     * 级联控件
+    * @param first   第一个控件ID #first
+    * @param second  第二个控件ID #second
+    * @param values  第一个控件关联与 第二个控件的数据 若是url则使用此地址ajax请求数据
+    * @param ctxt   默认替代文本 如 请选择
     */
     relation:function(first,second,values,ctxt){
   	  var t=$(second),that=this;
