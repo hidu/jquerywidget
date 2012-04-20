@@ -5,9 +5,11 @@
 	
 	window.jw={
 	version: "20110921 1.0",
+	ok_text:"确 定",
+	alert_title:"提示",
     
     //tab 选项卡
-    tab:function(headItems, contentItems,fn) {
+    tab:function(headItems, contentItems,fn,i) {
 		var C = $(headItems), B = $(contentItems);
 		C.click(function(e) {
 			var i = C.index(this);
@@ -18,7 +20,7 @@
 			$(this).addClass("cur");
 			B.hide().eq(i).show();
 		});
-		if(C.filter('.cur').size()<1)C.eq(0).addClass("cur");
+		if(C.filter('.cur').size()<1)C.eq(i||0).addClass("cur");
 		C.filter('.cur').trigger('click');
 	},
 	
@@ -211,7 +213,7 @@
 	        function setSize(width,height){
 	        	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
 	        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
-	        	autoBounds(width,height);
+	        	autoBounds(parseInt(width),parseInt(height));
 	        };
 	        function scrollPos(){
 	        	  isFixed=dialog.css('position')=='fixed';
@@ -392,8 +394,35 @@
 			}else{
 				createUI();
 			}
+		},
+	    
+		processbar:function(id,value){
+			var bar=$(id),
+			    t=bar.find('.jw-pbar-t');
+			if(!t.size()){
+				bar.addClass("jw-pbar").html("<div class='jw-pbar-t'>0%</div><div class='jw-pbar-v'>&nbsp;</div>");
+				t=bar.find('.jw-pbar-t');
+			}
+			var v=bar.find('.jw-pbar-v');
+			function setval(value){
+				value=parseInt(Math.min(Math.max(value||0,0),100));
+				t.html(value+"%").width(bar.width());
+				v.css("width",value+"%");
+			}
+			setval(value);
+			return {
+				    val:function(pv){
+				    	if(typeof pv=='undefined'){
+				    		return parseInt(t.text());
+				    	}else{
+				    		setval(pv);
+				    	}
+					}
+			};
 		}
-   };	
+	    
+   };
+	
 })(jQuery);
 
 ;(function($){	
@@ -408,11 +437,11 @@
      */
     var jwalert=function(text,option){
     	option=$.extend({},{icon:1,
-                  	   ok:"确 定",
+                  	   ok:jw.ok_text,
 	    		          onOk:function(){},
 	    		          cancle:null,
 	    		          onCancle:function(){},
-	    		          title:'提示'
+	    		          title:jw.alert_title
 	    		          },option||{});
     	var ico=(option.icon+"").split("x"),
     	    x=ico[0],y=ico.length==2?ico[1]:1;
