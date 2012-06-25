@@ -4,7 +4,7 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "20110921 1.0",
+	version: "20120625 1.0.1",
 	ok_text:"确 定",
 	alert_title:"提示",
     
@@ -155,7 +155,6 @@
 			     html:null,
 			     title:'',
 			     iframeScroll:true,
-			     iframeFetchTitle:true,
 			     zIndex:301,
 			     onLoad:function(){},
 			     onClose:function(){},
@@ -209,11 +208,24 @@
 	        function setTitle(title){
 	        	 option.title!==false && header.find('.jw-title').text(title);
 	         }
+	         
+	     	function parseSize(width,height){
+	         	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
+	        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
+	        	(width<=1) && (width=ww*width);
+	        	(height<=1) && (height=wh*height);
+	        	return [parseInt(width),parseInt(height)];
+	     	}
+	     	
+	     	if(option.width && option.height){
+	     	  var s=parseSize(option.width,option.height);
+	     	  option.width=s[0];
+	     	  option.height=s[1];
+	     	}
 	     	
 	        function setSize(width,height){
-	        	((width+"").indexOf("%")>0) && (width=(ww*parseFloat(width)/100.0));
-	        	((height+"").indexOf("%")>0) && (height=(wh*parseFloat(height)/100.0));
-	        	autoBounds(parseInt(width),parseInt(height));
+    	        var size=parseSize(width,height);
+	        	autoBounds(size[0],size[1]);
 	        };
 	        function scrollPos(){
 	        	  isFixed=dialog.css('position')=='fixed';
@@ -317,7 +329,7 @@
 			               if(cl>0 ){
 				               c.find('.close').click(close).end().find('.max').click(max);
 				               $('body',c).bind('close',close);
-				               if(option.iframeFetchTitle){
+				               if(option.title.length==0){
 					               var it=c.attr('title');
 					               if(it.length)setTitle(it);
 					              }
@@ -448,8 +460,8 @@
     	    id="jwalert"+new Date().getTime(),
     	    style="background-position:-"+(x-1)*50+"px -"+(y-1)*50+"px;",
     	    code="<div class='jw-alert'>" +
-	    			"<div class='icon' style='"+style+"'></div><div class='bd'>"+(text||'')+"</div><div style='clear:both'></div>" +
-	    			"<div class='ft'>" +
+	    			"<div class='jw-alert-icon' style='"+style+"'></div><div class='jw-alert-bd'>"+(text||'')+"</div><div style='clear:both'></div>" +
+	    			"<div class='jw-alert-ft'>" +
 	    			"<input type='button' value='&nbsp;"+option.ok+"&nbsp;' id='"+id+"_ok' />";
 		if(option.cancle!=null){
 			code+="&nbsp;&nbsp;<input type='button' value='&nbsp;"+option.cancle+"&nbsp;' id='"+id+"_cannel' />";
