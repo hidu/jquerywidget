@@ -4,7 +4,7 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "20120625 1.0.1",
+	version: "20120905 1.0.2",
 	ok_text:"确 定",
 	alert_title:"提示",
     
@@ -27,7 +27,7 @@
 	//笼罩层
 	over:function(opt){
 		opt=opt||'show';
-		var over,bh=$('body').height();
+		var over,bh=Math.max($('body').height(),$(window).height());
 		if(opt=='show'){
 			if($('.jw-over').length)return;
 			over=$('<div class="jw-over" ></div>');
