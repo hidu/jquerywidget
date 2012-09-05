@@ -177,6 +177,8 @@
 	            isFixed=false,
 	            that=this,
 	            th=hd.outerHeight();
+	            
+          var _w,_h;  
 	        
 	        $(win).resize(function(){
 	        	 ww=$(win).width();
@@ -242,8 +244,8 @@
 	           
 	          function setBounds(top,l,width,height){
 	        	 if(!width || !height)return;
-	        	  width=Math.min(width,ww);
-	        	  height=Math.min(height,wh-th);
+	        	  _w=width=Math.min(width,ww);
+	        	  _h=height=Math.min(height,wh-th);
 	        	  dialog.animate({top:top,left:l,width:width,height:height+th});
 	        	  if(!option.iframe && !isMax){
 	        		  bd.css('height','auto');
@@ -361,7 +363,7 @@
 	        	});
 	          }
 	        
-	        var fn=function(){autoBounds();dialog.is(":visible")&&that.over();};
+	        var fn=function(){toCenter(_w,_h);dialog.is(":visible")&&that.over();};
 	        $(win).resize(fn);
 	        
 	        dialog.bind('close',close).find('.close').live('click mousedown',close).end().find('.max').live('click mousedown',max);
