@@ -4,7 +4,7 @@
 	if(window.jw.version)return;
 	
 	window.jw={
-	version: "20120905 1.0.2",
+	version: "20120920 1.0.3",
 	ok_text:"确 定",
 	alert_title:"提示",
     
@@ -29,7 +29,7 @@
 		opt=opt||'show';
 		var over,bh=Math.max($('body').height(),$(window).height());
 		if(opt=='show'){
-			if($('.jw-over').length)return;
+			if($('.jw-over').length)return false;
 			over=$('<div class="jw-over" ></div>');
 			$().ready(function(){
 				$(document.body).append(over);
@@ -37,6 +37,7 @@
 				(typeof $.fn.bgiframe=='function') && over.bgiframe();
 				over.height(bh);
 			});
+			return true;
 		}else{
 			$('html').removeClass('jw-over-hidden');
 			setTimeout(function(){$('.jw-over').remove();},1);
@@ -169,7 +170,8 @@
 	            dialog="<div class='jw-dialog' id='"+_id+"' style='"+_style+"'><div class='jw-dialog-hd'></div><div class='jw-dialog-bd'></div></div>";
 	        _style=null;
 	        dialog=$(win.document.body).append(dialog).find("#"+_id);
-	        option.over && this.over();
+	        var has_create_over=false;//是否创建笼罩层
+	        option.over && (has_create_over=this.over());
 	        option.fixed && this.position_fixed(dialog,win);
 	        var bd=$('.jw-dialog-bd',dialog),
 	            hd=$('.jw-dialog-hd',dialog),
@@ -262,7 +264,7 @@
 	          var last={},lastMaxClickTime=0;
 	          function close(e){
 	        	     if(e)e.stopPropagation();
-	          	     that.over('close');
+	          	     has_create_over && that.over('close');
 	          	     if(0===option.onClose())return false;
 	          	    	 
 	          	     dialog.animate({top:wh/2+scrollPos().top,left:ww/2,width:0,height:0},function(){
@@ -353,7 +355,7 @@
 	         }
 	         
 	         //没有遮罩层时，可能会有有多个dialog
-	        if(!option.over){
+	        //if(!option.over){
 	        	dialog.click(function(){
 	        		var _max=option.zIndex;
 	        		$('.jw-dialog',win.document).not(dialog).each(function(){
@@ -361,7 +363,7 @@
 	        		});
 	        		dialog.css('z-index',_max);
 	        	});
-	          }
+	          //}
 	        
 	        var fn=function(){toCenter(_w,_h);dialog.is(":visible")&&that.over();};
 	        $(win).resize(fn);
